@@ -5,7 +5,13 @@ playerHurtBoxGroup = pygame.sprite.Group()
 enemyHitBoxGroup = pygame.sprite.Group()
 enemyHurtBoxGroup = pygame.sprite.Group()
 
+collisionGroup = pygame.sprite.Group()
 
+def clearGroups():
+    playerHitBoxGroup.empty()
+    playerHurtBoxGroup.empty()
+    enemyHitBoxGroup.empty()
+    enemyHurtBoxGroup.empty()
 
 def addBoxToGroup(type, sprite):
     if type == "PHitBox":
@@ -18,7 +24,9 @@ def addBoxToGroup(type, sprite):
     elif type == "EHurtBox":
         enemyHurtBoxGroup.add(sprite)
     else:
-        pass
+        collisionGroup.add(sprite)
+
+
 
 
 def removeBoxFromGroup(type, sprite):
@@ -35,6 +43,7 @@ def removeBoxFromGroup(type, sprite):
         pass
 
 
+
 def detectCollision():
     collisionsPHitToEHit = pygame.sprite.groupcollide(playerHitBoxGroup, enemyHitBoxGroup, False, False)
     collisionsPHitToEHurt = pygame.sprite.groupcollide(playerHitBoxGroup, enemyHurtBoxGroup, False, False)
@@ -49,6 +58,8 @@ def detectCollision():
 
     returnDictionary["PHurtToEHit"] = collisionsPHurtToEHit
     returnDictionary["PHurtToEHurt"] = collisionsPHurtToEHurt
+
+
 
     return returnDictionary
 

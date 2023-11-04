@@ -16,8 +16,7 @@ from Scripts.Logic import gameLogicFunctions
 class boss_Crimson(pygame.sprite.Sprite):
     def __init__(self, position, Player):
 
-        self.posX = position[0]
-        self.posY = position[1]
+
         self.HP = 100
 
 
@@ -31,11 +30,17 @@ class boss_Crimson(pygame.sprite.Sprite):
         self.state = "runAround"
         self.direction = 1
 
+
+
+
+        self.posX = position[0]
+        self.posY = position[1]
         self.animationTime = 0
-
-
         self.hurtbox = Collision.hurtBox(self, "EHurtBox", pygame.Rect(self.posX, self.posY, 50, 100), 10)
 
+
+
+        ##SPRITE SHEET STUFF
 
         spriteSheetAttack1 = "Assets/Boss_1/Attack1.png"
         spriteSheetAttack2 = "Assets/Boss_1/Attack2.png"
@@ -105,8 +110,6 @@ class boss_Crimson(pygame.sprite.Sprite):
         #if loop index is higher that the size of the frame return to the first frame
         if self.frame > (len(frame_set) - 1):
             self.frame = 0
-
-
 
 
         currentFrameWidth = self.stateToSpriteDict[state][self.frame][2]
@@ -194,6 +197,9 @@ class boss_Crimson(pygame.sprite.Sprite):
             else:
                 self.updateSprite("atk1")
                 self.refToCurrentAttack.update()
+
+
+
 
 
 

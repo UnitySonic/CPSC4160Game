@@ -3,6 +3,7 @@ import sys
 from Scripts.Logic import gameLogicFunctions
 from Scripts.Player import Player
 from Scripts.BossScripts.Boss1 import boss1
+from Scripts.Logic import Collision
 
 
 gameOver = False
@@ -64,6 +65,7 @@ def collisionDetection():
                     playerBox.getEntity().handleCollision(collisionType, enemyBox)
                 else:
                     pass
+                playerBox.handleCollision(collisionType, enemyBox)
 
 while gameOver != True:
 
@@ -90,6 +92,9 @@ while gameOver != True:
         #stageBackground.append(pygame.image.load("Assets/Boss_1/ruins2.png").convert_alpha())
         statue = pygame.image.load("Assets/Boss_1/statue.png").convert_alpha()
 
+        groundDimensions = pygame.Rect(0,600,screen_width, 120)
+        groundCollision = Collision.collisionBox(groundDimensions, 0)
+
 
         player = Player.Player((300,300))
         boss = boss1.boss_Crimson((400, 400), player)
@@ -110,7 +115,8 @@ while gameOver != True:
 
                 background = pygame.transform.scale(background, (new_width, new_height))
                 screen.blit(background, (0, 0))
-            ground = pygame.draw.rect(screen, (128,128,128), (0, 600, screen_width, 120))
+            ground = pygame.draw.rect(screen, (128,128,128), groundDimensions)
+
 
             collisionDetection()
 
@@ -121,9 +127,10 @@ while gameOver != True:
 
             pygame.draw.rect(screen, (255,255,255), player.rect)
             screen.blit(boss.image, boss.rect)
-            #drawCollisionBoxes()
+            drawCollisionBoxes()
             pygame.display.flip()
 
+            #gameLogicFunctions.clearGroups()
             clock.tick(60)
 
 
