@@ -7,6 +7,14 @@ enemyHurtBoxGroup = pygame.sprite.Group()
 
 collisionGroup = pygame.sprite.Group()
 
+entityList = []
+
+
+def addEntity(entity):
+    entityList.append(entity)
+def removeEntity(entity):
+    entityList.remove(entity)
+
 def clearGroups():
     playerHitBoxGroup.empty()
     playerHurtBoxGroup.empty()

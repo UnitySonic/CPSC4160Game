@@ -82,6 +82,7 @@ while gameOver != True:
     if stageSelect == "Boss1":
         bgScaleFactorX = 0.75
         bgScaleFactorY = 0.75
+        killEntityOutOfScreen = True
 
 
         stageBackground.append(pygame.image.load("Assets/Boss_1/sky.png"))
@@ -98,6 +99,9 @@ while gameOver != True:
 
         player = Player.Player((300,300))
         boss = boss1.boss_Crimson((400, 400), player)
+        gameLogicFunctions.addEntity(player)
+        gameLogicFunctions.addEntity(boss)
+
         while stageOver != True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -120,13 +124,24 @@ while gameOver != True:
 
             collisionDetection()
 
-            player.update()
-            boss.update()
+            for entity in gameLogicFunctions.entityList:
+                entity.update()
+                if hasattr(entity, "image"):
+                    screen.blit(entity.image, entity.rect)
+                else:
+                    if hasattr(entity, "hitboxes"):
+                        for hitbox in entity.hitboxes.values():
+                            pygame.draw.rect(screen, (255,255,255), hitbox.rect)
+                            if hitbox.rect.x < -10 or hitbox.rect.y > 2000:
+                                gameLogicFunctions.removeEntity(entity)
+                    else:
+                        pygame.draw.rect(screen, (255,255,255), entity.hurtbox.rect)
+            print(len(gameLogicFunctions.entityList))
 
 
 
-            pygame.draw.rect(screen, (255,255,255), player.rect)
-            screen.blit(boss.image, boss.rect)
+
+
             drawCollisionBoxes()
             pygame.display.flip()
 
