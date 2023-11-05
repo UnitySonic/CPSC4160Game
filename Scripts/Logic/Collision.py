@@ -47,11 +47,10 @@ class hitbox(pygame.sprite.Sprite):
         if CollisionType == "PHitToEHit":
             if self.priority > OffendingHitbox.priority:
                 OffendingHitbox.killHitBox()
-            elif self.priority < OffendingHitbox.priority:
+            elif self.priority <= OffendingHitbox.priority:
                 self.killHitBox()
-            else:
-                #Do Nothing
-                pass
+        if CollisionType == "PHitToEHurt":
+                OffendingHitbox.getEntity().handleCollision(CollisionType, self)
 
 
 
@@ -79,6 +78,13 @@ class hurtBox(pygame.sprite.Sprite):
         self.rect.update((self.parent.posX, self.parent.posY), (self.rect.width, self.rect.height))
 
 
+    def handleCollision(self, collisionType, OffendingBox):
+
+        if collisionType == "PHurtToEHit":
+                self.getEntity().handleCollision(collisionType, OffendingBox)
+        if collisionType == "PHurtToEHurt":
+                    #player priortize
+                self.getEntity().handleCollision(collisionType, OffendingBox)
 
 
 
@@ -86,5 +92,34 @@ class hurtBox(pygame.sprite.Sprite):
 
     def __del__ (self):
         pass
+
+
+
+class collisionBox(pygame.sprite.Sprite):
+
+    def __init__(self, rect, damage) -> None:
+        super().__init__()
+
+        self.rect = rect
+        self.damage = damage
+        gameLogicFunctions.addBoxToGroup("Ground", self)
+
+
+
+    def handleCollision(self, collisionType, OffendingBox):
+
+        if collisionType == "PHurtToEHit":
+                self.getEntity().handleCollision(collisionType, OffendingBox)
+        if collisionType == "PHurtToEHurt":
+                    #player priortize
+                self.getEntity().handleCollision(collisionType, OffendingBox)
+
+
+
+
+
+    def __del__ (self):
+        pass
+
 
 
