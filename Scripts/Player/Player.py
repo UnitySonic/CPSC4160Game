@@ -17,6 +17,7 @@ class Player:
         self.leftPressed = False
         self.rightPressed = False
         self.commitedToAttack = False
+        self.scaleFactor =1
 
 
 
@@ -42,6 +43,15 @@ class Player:
         self.refToCurrentAttack = None
         self.commitedToAttack = False
 
+    def getSpriteScale(self):
+        return self.scaleFactor
+
+
+    def getCurrentSpriteWidth(self):
+        return self.rect.width
+
+    def getCurrentSpriteHeight(self):
+        return self.rect.height
 
 
 

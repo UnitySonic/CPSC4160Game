@@ -16,7 +16,8 @@ from Scripts.Logic import gameLogicFunctions
 class boss_Crimson(pygame.sprite.Sprite):
     def __init__(self, position, Player):
 
-
+        self.posX = position[0]
+        self.posY = position[1]
         self.HP = 100
 
 
@@ -24,23 +25,25 @@ class boss_Crimson(pygame.sprite.Sprite):
 
         self.commitToAttack = False
         self.refToCurrentAttack = None
+        self.attackIDCounter = 0
+
+
         self.elapsedFramesInPhase = 0
 
 
-        self.state = "runAround"
+        self.state = "idle"
         self.direction = 1
 
+        self.canJump = True
 
 
 
-        self.posX = position[0]
-        self.posY = position[1]
-        self.animationTime = 0
+
         self.hurtbox = Collision.hurtBox(self, "EHurtBox", pygame.Rect(self.posX, self.posY, 50, 100), 10)
 
 
 
-        ##SPRITE SHEET STUFF
+        #Sprite Sheet CONTENT
 
         spriteSheetAttack1 = "Assets/Boss_1/Attack1.png"
         spriteSheetAttack2 = "Assets/Boss_1/Attack2.png"
@@ -61,8 +64,7 @@ class boss_Crimson(pygame.sprite.Sprite):
         self.sheetRun = pygame.image.load(spriteSheetRun)
         self.sheetHit = pygame.image.load(spriteSheetHit)
 
-        #defines area of a single sprite of an image
-        #self.sheet.set_clip(pygame.Rect(0, 0, 0, 0))
+
 
         #loads spritesheet images
         self.image = self.sheetAtk1.subsurface(self.sheetAtk1.get_clip())
@@ -73,6 +75,7 @@ class boss_Crimson(pygame.sprite.Sprite):
 
         #variable for looping the frame sequence
         self.frame = 0
+        self.animationTime = 0
 
         self.scaleFactor = 2
 
@@ -82,12 +85,17 @@ class boss_Crimson(pygame.sprite.Sprite):
         self.death_states = {0: (108,84,45,83), 1: (358,74,52,93), 2: (608,72,66,95), 3: (858,64,96,103), 4: (1108,57,105,110), 5: (1358,45,96,122), 6: (1608,154,105,13)}
         self.fall_states = {0: (107,81,65,86), 1: (357,74,64,93)}
         self.idle_states = {0: (108,72, 57, 95), 1: (358,67,56,100), 2: (608,64,56,103), 3: (858,64,56,103), 4: (1108,67,57,100), 5: (1358,63,55,104), 6: (1608,70,54,97), 7: (1858,70,56,97)}
-        self.jump_states = {0: (91,86,69,81), 1: (332,87,78,80)}
+        self.jump_states = {0: (332,87,78,80)}
+        #self.jump_states = {0: (91,86,69,81), 1: (332,87,78,80)}
         self.run_states = {0: (94,106,65,61), 1: (342,105,67,62), 2: (592,102,67,65), 3: (839,99,70,68), 4: (1092,106,67,61), 5: (1343,100,66,67), 6: (1594,102,65,65), 7: (1846,100,63,64)}
         self.hit_states = {0: (106,80,45,87), 1: (358,81,34,86), 2: (608,87,35,80)}
 
-        self.stateToSpriteDict = {"runAround" : self.run_states, "atk1" : self.atk1_states, "atk2" : self.atk2_states}
-        self.stateToSheetDict = {"runAround" : self.sheetRun, "atk1" : self.sheetAtk1, "atk2" : self.sheetAtk2}
+        self.stateToSpriteDict = {"runAround" : self.run_states, "atk1" : self.atk1_states, "atk2" : self.atk2_states, "death" : self.death_states, "fall" : self.fall_states, "idle" : self.idle_states,
+                                  "jump" : self.jump_states, "hit" : self.hit_states}
+        self.stateToSheetDict = {"runAround" : self.sheetRun, "atk1" : self.sheetAtk1, "atk2" : self.sheetAtk2, "death" : self.sheetDeath, "fall" : self.sheetFall, "idle": self.sheetIdle,
+                                 "jump" : self.sheetJump, "hit" : self.sheetHit}
+        self.currentFrameWidth = 0
+        self.currentFrameHeight = 0
 
 
 
@@ -95,6 +103,23 @@ class boss_Crimson(pygame.sprite.Sprite):
 
     def set_state(self, new_state):
         self.state = new_state
+        self.frame = 0
+        self.animationTime = 0
+        self.elapsedFramesInPhase = 0
+
+
+
+
+    def getCurrentSpriteWidth(self):
+        return self.currentFrameWidth
+
+
+    def getCurrentSpriteHeight(self):
+        return self.currentFrameHeight
+
+    def getSpriteScale(self):
+        return self.scaleFactor
+
 
 
     def get_frame(self, frame_set, state):
@@ -112,10 +137,16 @@ class boss_Crimson(pygame.sprite.Sprite):
             self.frame = 0
 
 
-        currentFrameWidth = self.stateToSpriteDict[state][self.frame][2]
-        currentFrameHeight = self.stateToSpriteDict[state][self.frame][3]
+        self.currentFrameWidth =  currentFrameWidth = self.stateToSpriteDict[state][self.frame][2]
+        self.currentFrameHeight = currentFrameHeight = self.stateToSpriteDict[state][self.frame][3]
         newY =  self.posY - (currentFrameHeight * self.scaleFactor)
-        newX = self.posX - currentFrameWidth * self.scaleFactor
+        newX = 0
+
+        if self.direction == 1:
+            newX = self.posX
+        else:
+            newX = self.posX - (currentFrameWidth * self.scaleFactor)
+
 
 
         self.rect.update((newX, newY), (currentFrameWidth, currentFrameHeight))
@@ -150,17 +181,16 @@ class boss_Crimson(pygame.sprite.Sprite):
 
     def runAroundState(self):
 
-        MAXTIMEINPHASE = 600
+        MAXTIMEINPHASE = 300
 
         self.updateSprite("runAround")
         if self.posX <= 5 or self.posX >= 1200:
             self.direction *= -1
         self.posX += 4 * self.direction
-        self.elapsedFramesInPhase +=1
 
         if self.elapsedFramesInPhase >= MAXTIMEINPHASE:
             self.elapsedFramesInPhase = 0
-            self.set_state("atk1")
+            self.set_state("fireball")
 
 
 
@@ -192,18 +222,55 @@ class boss_Crimson(pygame.sprite.Sprite):
             if (self.refToCurrentAttack == None):
                 self.elapsedFramesInPhase = 0
                 self.commitToAttack = False
-                self.set_state("runAround")
+                self.set_state("idle")
 
             else:
                 self.updateSprite("atk1")
                 self.refToCurrentAttack.update()
 
+    def atk2State(self):
+        if self.commitToAttack == False:
+            distance = self.rect.centerx - self.playerRef.rect.centerx
+            print(f"distance : {distance}")
+
+            print(f"centerXBoss: {self.rect.centerx}")
+            print(f"centerXPlayer2 : {self.playerRef.rect.centerx}")
+
+            if abs(distance) > 60:
+                if (distance < 0):
+                    self.direction = 1
+                if(distance > 0):
+                    self.direction = -1
+
+                self.posX += 4 * self.direction
+                self.updateSprite("runAround")
+            else:
+
+                self.commitToAttack = True
+                self.refToCurrentAttack = boss1Attacks.meleeAttack2(self)
+        else:
+            if (self.refToCurrentAttack == None):
+                self.commitToAttack = False
+                self.set_state("idle")
+
+            else:
+                self.updateSprite("atk2")
+                self.refToCurrentAttack.update()
 
 
 
+    def fireballState(self):
+        self.updateSprite("atk2")
 
-
-
+        if(self.commitToAttack == False):
+            self.refToCurrentAttack = boss1Attacks.Fireball(0, 8 *self.direction, True, self)
+            self.commitToAttack = True
+        else:
+            if(self.refToCurrentAttack == None):
+                self.set_state("idle")
+                self.commitToAttack = False
+            else:
+                self.refToCurrentAttack.update()
 
 
 
@@ -213,15 +280,62 @@ class boss_Crimson(pygame.sprite.Sprite):
 
 
 
-    def jumpState(self, elapsedTime, MAXTIMEINPHASE):
-        pass
+    def jumpState(self, beginFall = False):
+         if beginFall == True:
+             self.elapsedFramesInPhase = 80
 
+
+
+
+         if self.posX <= 5 or self.posX >= 1200:
+            self.direction *= -1
+         self.posX += 4 * self.direction
+         if self.elapsedFramesInPhase >= 80:
+
+
+             if self.isGrounded():
+                 self.elapsedFramesInPhase = 0
+                 self.set_state("runAround")
+             else:
+                 self.posY+=5
+                 self.updateSprite("fall")
+         else:
+             self.posY -=5
+             self.updateSprite("jump")
+
+
+    def isGrounded(self):
+        collide = pygame.sprite.spritecollide(self.hurtbox, gameLogicFunctions.collisionGroup, False)
+        if collide:
+            return True
+        else:
+            return False
+
+
+    def idleState(self):
+        IDLESTATETIME = 120
+        self.updateSprite("idle")
+
+
+        if self.elapsedFramesInPhase >= IDLESTATETIME:
+
+            choice = random.randint(0,4)
+            choice = 2
+
+            if choice == 0:
+                self.set_state("runAround")
+            elif choice == 1:
+                self.set_state("atk1")
+            elif choice == 2:
+                self.set_state("atk2")
+            elif choice == 3:
+                self.set_state("fireball")
+            elif choice == 4:
+                self.set_state("jump")
 
 
 
         #Two Aspects of this Phase, Running Left and Right, and Jumping
-
-
     def handleCollision(self, CollisionType, Box):
 
         if CollisionType  == "PHitToEHurt":
@@ -232,15 +346,25 @@ class boss_Crimson(pygame.sprite.Sprite):
 
     def update(self):
         self.hurtbox.update()
-        if self.state == "runAround":
+
+
+        if self.isGrounded() == False:
+            self.set_state("jump")
+            self.jumpState(True)
+
+        elif self.state == "runAround":
             self.runAroundState()
         elif self.state == "atk1":
             self.atk1State()
+        elif self.state == "atk2":
+            self.atk2State()
+        elif self.state == "jump":
+            self.jumpState()
+        elif self.state == "fireball":
+            self.fireballState()
+        elif self.state == "idle":
+            self.idleState()
+
         self.elapsedFramesInPhase +=1
 
     #Start of State functions
-
-
-
-
-
