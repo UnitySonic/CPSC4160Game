@@ -97,7 +97,7 @@ while gameOver != True:
         groundCollision = Collision.collisionBox(groundDimensions, 0)
 
 
-        player = Player.Player((300,300))
+        player = Player.Player((300,600))
         boss = boss1.boss_Crimson((400, 400), player)
         gameLogicFunctions.addEntity(player)
         gameLogicFunctions.addEntity(boss)
@@ -136,7 +136,6 @@ while gameOver != True:
                                 gameLogicFunctions.removeEntity(entity)
                     else:
                         pygame.draw.rect(screen, (255,255,255), entity.hurtbox.rect)
-            print(len(gameLogicFunctions.entityList))
 
 
 
