@@ -35,8 +35,8 @@ ground_image = pygame.transform.scale(ground_image, (SCREEN_WIDTH, SCREEN_HEIGHT
 main_character = Player((200, 650))
 
 # Define the new width and height for the player
-new_width = 200  
-new_height = 200  
+new_width = 200
+new_height = 200
 
 # Resize the player's image
 main_character.image = pygame.transform.scale(main_character.image, (new_width, new_height))
@@ -72,7 +72,7 @@ show_title = True
 show_dialogue = False
 dialogue_index = 0
 # tracks the timing between dialogue
-dialogue_timer = time.time() 
+dialogue_timer = time.time()
 
 # Define the background for dialogue
 dialogue_background = pygame.Surface((800, 200))
@@ -82,7 +82,7 @@ dialogue_background.set_alpha(150)
 dialogue_texts = [
 
     "Thank you for getting here so fast, Cyline.",
-    "I have heard great things about SpellBlades trained from your academy.",
+    "I have heard great things about Spell Blades trained from your academy.",
     "I have tracked the Fallen Archmage, Crimson, to these surrounding lands.",
     "It's believed that he has made a contract with a strong demon to increase his deadly fire magic.",
     "I request your assistance hunting him down before he harms any nearby villages.",
@@ -104,6 +104,7 @@ while run:
     character_speed = 6
 
     key = pygame.key.get_pressed()
+    main_character.update()
 
     if key[pygame.K_LEFT] and scroll > 0:
         main_character.update()
@@ -120,7 +121,7 @@ while run:
 
     # Press c to Dash (WIP)
     if key[pygame.K_DOWN]:
-        main_character.handle_event(pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_c})) 
+        main_character.handle_event(pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_c}))
 
     # Ensure the player's vertical position is within ground level bounds
     main_character.posY = min(max(main_character.posY, 350), SCREEN_HEIGHT - main_character.getCurrentSpriteHeight())
@@ -146,32 +147,32 @@ while run:
         import mainScript
 
         # closes the current game window
-        pygame.quit()  
+        pygame.quit()
 
         # quits the current script
-        raise SystemExit  
+        raise SystemExit
 
     # Draw title and start message in the middle of the screen
-    title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50))
-    message_rect = message_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
+    title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3 - 50))
+    message_rect = message_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3 + 50))
 
     # Draw the current dialogue text
     if show_dialogue:
         if dialogue_index < len(dialogue_texts):
             # Display the background behind the dialogue text
-            screen.blit(dialogue_background, (SCREEN_WIDTH // 2 - 400, SCREEN_HEIGHT // 2 - 100))
+            screen.blit(dialogue_background, (SCREEN_WIDTH // 2 - 400, SCREEN_HEIGHT // 3 - 100))
             dialogue_text = dialogue_font.render(dialogue_texts[dialogue_index], True, (255, 255, 255))
-            dialogue_rect = dialogue_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50))
+            dialogue_rect = dialogue_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3 - 50))
             screen.blit(dialogue_text, dialogue_rect)
 
             # Display "Press T to Continue" hint
             hint_text = dialogue_font.render("Press T to Continue", True, (255, 255, 255))
-            hint_rect = hint_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 75))
+            hint_rect = hint_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3 + 75))
             screen.blit(hint_text, hint_rect)
         else:
             # Display "Continue Right to next level -->" hint
             hint_text = dialogue_font.render("Continue Right to next level -->", True, (255, 255, 255))
-            hint_rect = hint_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 75))
+            hint_rect = hint_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3 + 75))
             screen.blit(hint_text, hint_rect)
 
     # checks if text or title screen is shown
@@ -186,10 +187,10 @@ while run:
             show_title = False
             show_dialogue = True
 
-    #text delay before they can press T again 
+    #text delay before they can press T again
     elif show_dialogue:
         if dialogue_index < len(dialogue_texts):
-            if key[pygame.K_t] and time.time() - dialogue_timer > 1: 
+            if key[pygame.K_t] and time.time() - dialogue_timer > 1:
                 dialogue_index += 1
                 dialogue_timer = time.time()
 
