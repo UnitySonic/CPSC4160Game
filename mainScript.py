@@ -3,6 +3,7 @@ import sys
 from Scripts.Logic import gameLogicFunctions
 from Scripts.Player import Player
 from Scripts.BossScripts.Boss1 import boss1
+from Scripts.BossScripts.Boss2 import boss2
 from Scripts.Logic import Collision
 
 
@@ -70,7 +71,7 @@ def collisionDetection():
 while gameOver != True:
 
 
-    pygame.display.set_caption("Midterm - Spritesheet character animation")
+    pygame.display.set_caption("The Spell Blade - Milestone 2")
 
     #set up refresh rate
     clock = pygame.time.Clock()
@@ -80,6 +81,7 @@ while gameOver != True:
 
 
     if stageSelect == "Boss1":
+        drawCollision = False
         bgScaleFactorX = 0.75
         bgScaleFactorY = 0.75
         killEntityOutOfScreen = True
@@ -93,14 +95,16 @@ while gameOver != True:
         #stageBackground.append(pygame.image.load("Assets/Boss_1/ruins2.png").convert_alpha())
         statue = pygame.image.load("Assets/Boss_1/statue.png").convert_alpha()
 
-        groundDimensions = pygame.Rect(0,600,screen_width, 120)
+        groundDimensions = pygame.Rect(-100,600,screen_width + 200, 120)
         groundCollision = Collision.collisionBox(groundDimensions, 0)
 
 
         player = Player.Player((300,600))
         boss = boss1.boss_Crimson((400, 400), player)
+        boss2 = boss2.boss_Demon((200,200), player)
         gameLogicFunctions.addEntity(player)
         gameLogicFunctions.addEntity(boss)
+        gameLogicFunctions.addEntity(boss2)
 
         while stageOver != True:
             for event in pygame.event.get():
@@ -108,6 +112,10 @@ while gameOver != True:
                     pygame.quit()
                     sys.exit()
                 else:
+                    if event.type == pygame.KEYDOWN:
+                        pressed = pygame.key.get_pressed()
+                        if pressed[pygame.K_h]:
+                            drawCollision = not drawCollision
                     player.handle_event(event)
             screen.fill((0,0,0))
 
@@ -140,8 +148,8 @@ while gameOver != True:
 
 
 
-
-            drawCollisionBoxes()
+            if drawCollision:
+                drawCollisionBoxes()
             pygame.display.flip()
 
             #gameLogicFunctions.clearGroups()
