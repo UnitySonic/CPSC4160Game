@@ -40,7 +40,7 @@ class Player:
         self.commitedToAttack = False
         self.jumping = False
         self.falling = False
-        self.scaleFactor = 2
+        self.scaleFactor = 2.5
         self.yGravity = 1
         self.jumpHeight = 15
         self.yVelocity = 15
@@ -181,7 +181,7 @@ class Player:
         else:
             newX = self.posX - (self.currentFrameWidth * self.scaleFactor)
 
-        self.rect.update((newX, newY), (self.currentFrameWidth, self.currentFrameHeight))
+        self.rect = pygame.Rect(newX, newY, self.currentFrameWidth, self.currentFrameHeight)
 
         return frame_set[self.frame]
 
@@ -203,7 +203,7 @@ class Player:
             self.image = self.stateToSheetDict[stateToUse].subsurface(self.stateToSheetDict[stateToUse].get_clip())
         #Scaling
         scaledX = int(self.rect.width * self.scaleFactor)
-        scaledY = (self.rect.height * self.scaleFactor)
+        scaledY = int(self.rect.height * self.scaleFactor)
         self.image = pygame.transform.scale(self.image, (scaledX,scaledY))
 
     def attackEnded(self):

@@ -219,7 +219,7 @@ class Fireball():
             del self
         else:
             hitbox = self.hitboxes[0]
-            hitbox.rect.update((hitbox.rect.left + self.run, hitbox.rect.top + self.rise), (hitbox.rect.width, hitbox.rect.height))
+            hitbox.rect = pygame.Rect(hitbox.rect.left + self.run, hitbox.rect.top + self.rise, hitbox.rect.width, hitbox.rect.height)
 
             hitbox.update()
 
