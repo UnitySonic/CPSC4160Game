@@ -102,7 +102,7 @@ class hurtBox(pygame.sprite.Sprite):
 
 
 
-        self.rect.update((newX, newY), (self.rect.width, self.rect.height))
+        self.rect = pygame.Rect(newX, newY, self.rect.width, self.rect.height)
 
 
     def handleCollision(self, collisionType, OffendingBox):

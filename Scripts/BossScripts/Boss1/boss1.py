@@ -35,6 +35,8 @@ class boss_Crimson(pygame.sprite.Sprite):
         self.direction = 1
 
         self.canJump = True
+        self.yVelocity = 1
+        self.xVelocity = 0
 
 
 
@@ -106,6 +108,8 @@ class boss_Crimson(pygame.sprite.Sprite):
         self.frame = 0
         self.animationTime = 0
         self.elapsedFramesInPhase = 0
+        self.xVelocity = 0
+        self.yVelocity = 0
 
 
 
@@ -149,7 +153,7 @@ class boss_Crimson(pygame.sprite.Sprite):
 
 
 
-        self.rect.update((newX, newY), (currentFrameWidth, currentFrameHeight))
+        self.rect = pygame.Rect(newX, newY, currentFrameWidth, currentFrameHeight)
 
 
         return frame_set[self.frame]
@@ -184,9 +188,9 @@ class boss_Crimson(pygame.sprite.Sprite):
         MAXTIMEINPHASE = 300
 
         self.updateSprite("runAround")
-        if self.posX <= 5 or self.posX >= 1200:
+        if self.posX <= 15 or self.posX >= 1200:
             self.direction *= -1
-        self.posX += 4 * self.direction
+        self.xVelocity = 4 * self.direction
 
         if self.elapsedFramesInPhase >= MAXTIMEINPHASE:
             self.elapsedFramesInPhase = 0
@@ -212,7 +216,7 @@ class boss_Crimson(pygame.sprite.Sprite):
                 if(distance > 0):
                     self.direction = -1
 
-                self.posX += 4 * self.direction
+                self.xVelocity = 4 * self.direction
                 self.updateSprite("runAround")
             else:
 
@@ -242,7 +246,7 @@ class boss_Crimson(pygame.sprite.Sprite):
                 if(distance > 0):
                     self.direction = -1
 
-                self.posX += 4 * self.direction
+                self.xVelocity = 4 * self.direction
                 self.updateSprite("runAround")
             else:
 
@@ -282,25 +286,25 @@ class boss_Crimson(pygame.sprite.Sprite):
 
     def jumpState(self, beginFall = False):
          if beginFall == True:
-             self.elapsedFramesInPhase = 80
+             self.elapsedFramesInPhase = 40
+             print(beginFall)
 
 
 
 
-         if self.posX <= 5 or self.posX >= 1200:
+         if self.posX <= 15 or self.posX >= 1200:
             self.direction *= -1
-         self.posX += 4 * self.direction
-         if self.elapsedFramesInPhase >= 80:
-
-
+         self.xVelocity = 4 * self.direction
+         if self.elapsedFramesInPhase >= 40:
              if self.isGrounded():
+                 self.yVelocity = 0
                  self.elapsedFramesInPhase = 0
                  self.set_state("runAround")
              else:
-                 self.posY+=5
-                 self.updateSprite("fall")
+                self.yVelocity = 5
+                self.updateSprite("fall")
          else:
-             self.posY -=5
+             self.yVelocity = -5
              self.updateSprite("jump")
 
 
@@ -320,7 +324,7 @@ class boss_Crimson(pygame.sprite.Sprite):
         if self.elapsedFramesInPhase >= IDLESTATETIME:
 
             choice = random.randint(0,4)
-            choice = 2
+            choice = 4
 
             if choice == 0:
                 self.set_state("runAround")
@@ -347,8 +351,12 @@ class boss_Crimson(pygame.sprite.Sprite):
     def update(self):
         self.hurtbox.update()
 
+        self.posX += self.xVelocity
+        self.posY += self.yVelocity
 
-        if self.isGrounded() == False:
+        print(self.elapsedFramesInPhase)
+
+        if self.isGrounded() == False and self.yVelocity>0:
             self.set_state("jump")
             self.jumpState(True)
 
@@ -364,6 +372,7 @@ class boss_Crimson(pygame.sprite.Sprite):
             self.fireballState()
         elif self.state == "idle":
             self.idleState()
+        
 
         self.elapsedFramesInPhase +=1
 
