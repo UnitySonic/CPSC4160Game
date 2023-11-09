@@ -2,12 +2,17 @@ import pygame
 from Scripts.Logic import gameLogicFunctions
 from Scripts.Logic import Collision
 from Scripts.Player import PlayerAttacks
+from Scripts import Entity
 
 
-class Player:
+class Player(Entity.Entity):
 
     def __init__(self, position):
         #load all spritesheets
+
+        super().__init__(position)
+
+
         self.idleSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Idle/Battlemage Idle.png")
         self.runSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Running/Battlemage Run.png")
         self.jumpNeutralSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Neutral/Battlemage Jump Neutral.png")
@@ -26,12 +31,12 @@ class Player:
         self.magic3Sheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Spin Attack/Battlemage Spin Attack.png")
         self.deathSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Death/Battlemage Death.png")
 
-        self.posX = position[0]
-        self.posY = position[1]
+
         self.rect = pygame.Rect(self.posX, self.posY, 20, 32)
         self.hurtbox = Collision.hurtBox(self, "PHurtBox", self.rect, 0)
         self.HP = 100
-        self.direction = 1
+
+
         self.refToCurrentAttack = None
         self.leftPressed = False
         self.rightPressed = False
@@ -56,15 +61,13 @@ class Player:
         self.NeutralAirborneSet = ["jumpNeutral", "fallNeutral"]
 
         self.refToAirborneSet = None
-        self.elapsedFramesInPhase = 0
 
         self.image = self.idleSheet.subsurface(self.idleSheet.get_clip())
         self.rect = self.image.get_rect()
 
         self.rect.topleft = position
 
-        self.frame = 0
-        self.animationTime = 0
+
 
 
         #states
@@ -148,73 +151,15 @@ class Player:
                                    "fallForward": self.fallForwardSheet,
                                    "dash": self.dashSheet
                                   }
+        self.stateToFunctionDict = {"idle": self.idleState,
+                                    "run": self.runState,
+                                    "air": self.airBorneState
 
-        self.currentFrameWidth = 0
-        self.currentFrameHeight = 0
-
-    def set_state(self, new_state):
-        self.state = new_state
-        self.frame = 0
-        self.animationTime = 0
-        self.elapsedFramesInPhase = 0
-
-    def getCurrentSpriteWidth(self):
-        return self.currentFrameWidth
-
-    def getCurrentSpriteHeight(self):
-        return self.currentFrameHeight
-
-    def getSpriteScale(self):
-        return self.scaleFactor
-
-    def get_frame(self, frame_set, state):
-
-        self.animationTime += 1
-
-        if self.animationTime > 3:
-            self.frame += 1
-            self.animationTime = 0
-
-        if self.frame > (len(frame_set) - 1):
-            self.frame = 0
-
-        self.currentFrameWidth = self.stateToSpriteDict[state][self.frame][2]
-        self.currentFrameHeight = self.stateToSpriteDict[state][self.frame][3]
-        newY = self.posY - (self.currentFrameHeight * self.scaleFactor)
-        newX = 0
-
-        if self.direction == 1:
-            newX = self.posX
-        else:
-            newX = self.posX - (self.currentFrameWidth * self.scaleFactor)
-
-        self.rect = pygame.Rect(newX, newY, self.currentFrameWidth, self.currentFrameHeight)
-
-        return frame_set[self.frame]
+                                   }
 
 
-    def clip(self, clipped_rect, state):
-            if type(clipped_rect) is dict:
-                self.stateToSheetDict[state].set_clip(pygame.Rect(self.get_frame(clipped_rect,state)))
-            else:
-                self.stateToSheetDict[state].set_clip(pygame.Rect(clipped_rect))
 
-            return clipped_rect
 
-    def updateSprite(self, stateToUse, transition = False):
-
-        if transition:
-            self.frame = 0
-
-        self.clip(self.stateToSpriteDict[stateToUse], stateToUse)
-        if self.direction == -1:
-            self.image = pygame.transform.flip(self.stateToSheetDict[stateToUse].subsurface(self.stateToSheetDict[stateToUse].get_clip()), True, False)
-        else:
-            self.image = self.stateToSheetDict[stateToUse].subsurface(self.stateToSheetDict[stateToUse].get_clip())
-        #Scaling
-        scaledX = int(self.rect.width * self.scaleFactor)
-        scaledY = int(self.rect.height * self.scaleFactor)
-        self.image = pygame.transform.scale(self.image, (scaledX,scaledY))
 
     def attackEnded(self):
         self.refToCurrentAttack = None
@@ -239,7 +184,7 @@ class Player:
 
             #jumping
             if event.key == pygame.K_z:
-                print("Jump Released")
+
                 self.jumpPressed = False
             if not self.jumpPressed:
                 self.falling = True
@@ -256,7 +201,7 @@ class Player:
             if pressed[pygame.K_RIGHT]:
                 self.rightPressed = True
             if pressed[pygame.K_z]:
-                print("Jump Pressed")
+
                 self.jumpPressed = True
             if pressed[pygame.K_c]:
                 self.dashPressed = True
@@ -269,23 +214,7 @@ class Player:
         self.rect.y = self.posY
         self.hurtbox.update()
         self.elapsedFramesInPhase += 1
-
-        if self.state == "idle":
-            self.idleState()
-        elif self.state == "run":
-            self.runState()
-        elif self.state == "jumpNeutral":
-            self.jumpNeutralState()
-        elif self.state == "fallNeutral":
-            self.fallNeutralState()
-        elif self.state == "jumpForward":
-            self.jumpForwardState()
-        elif self.state == "fallForward":
-            self.fallForwardState()
-        elif self.state == "dash":
-            self.fallForwardState()
-        elif self.state == "air":
-            self.airBorneState()
+        self.stateToFunctionDict[self.state]()
 
         if self.state == "atk1":
             if self.commitedToAttack != True:
@@ -294,20 +223,12 @@ class Player:
         if self.commitedToAttack == True:
                 self.refToCurrentAttack.update()
 
-    def isGrounded(self):
-        collide = pygame.sprite.spritecollide(self.hurtbox, gameLogicFunctions.collisionGroup, False)
-        if collide:
-            return True
-        else:
-            return False
 
     def idleState(self):
         self.updateSprite("idle")
 
-
-
         if self.jumpPressed:
-            print("idle")
+
             self.isJumping = True
             self.set_state("air")
             if self.leftPressed or self.rightPressed:
