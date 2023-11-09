@@ -205,10 +205,7 @@ class boss_Crimson(pygame.sprite.Sprite):
 
         if self.commitToAttack == False:
             distance = self.rect.centerx - self.playerRef.rect.centerx
-            print(f"distance : {distance}")
 
-            print(f"centerXBoss: {self.rect.centerx}")
-            print(f"centerXPlayer2 : {self.playerRef.rect.centerx}")
 
             if abs(distance) > 60:
                 if (distance < 0):
@@ -235,10 +232,7 @@ class boss_Crimson(pygame.sprite.Sprite):
     def atk2State(self):
         if self.commitToAttack == False:
             distance = self.rect.centerx - self.playerRef.rect.centerx
-            print(f"distance : {distance}")
 
-            print(f"centerXBoss: {self.rect.centerx}")
-            print(f"centerXPlayer2 : {self.playerRef.rect.centerx}")
 
             if abs(distance) > 60:
                 if (distance < 0):
@@ -287,7 +281,7 @@ class boss_Crimson(pygame.sprite.Sprite):
     def jumpState(self, beginFall = False):
          if beginFall == True:
              self.elapsedFramesInPhase = 40
-             print(beginFall)
+
 
 
 
@@ -354,7 +348,7 @@ class boss_Crimson(pygame.sprite.Sprite):
         self.posX += self.xVelocity
         self.posY += self.yVelocity
 
-        print(self.elapsedFramesInPhase)
+
 
         if self.isGrounded() == False and self.yVelocity>0:
             self.set_state("jump")
@@ -372,7 +366,7 @@ class boss_Crimson(pygame.sprite.Sprite):
             self.fireballState()
         elif self.state == "idle":
             self.idleState()
-        
+
 
         self.elapsedFramesInPhase +=1
 
