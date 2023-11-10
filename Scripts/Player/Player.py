@@ -2,36 +2,47 @@ import pygame
 from Scripts.Logic import gameLogicFunctions
 from Scripts.Logic import Collision
 from Scripts.Player import PlayerAttacks
+from Scripts import Entity
+import json
 
 
-class Player:
+class Player(Entity.Entity):
 
     def __init__(self, position):
         #load all spritesheets
-        self.idleSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Idle/Battlemage Idle.png")
-        self.runSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Running/Battlemage Run.png")
-        self.jumpNeutralSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Neutral/Battlemage Jump Neutral.png")
-        self.fallNeutralSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Neutral/Battlemage Jump Neutral.png")
-        self.jumpForwardSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Foward/Battlemage Jump Foward.png")
-        self.fallForwardSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Foward/Battlemage Jump Foward.png")
-        self.crouchSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Crouch/Battlemage Crouch.png")
-        self.dashSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Dash/Battlemage Dash.png")
-        self.attack1Sheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Attack 1/Battlemage Attack 1.png")
-        self.attack2Sheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Attack 2/Battlemage Attack 2.png")
-        self.attack3Sheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Attack 3/Battlemage Attack 3.png")
-        self.crouchAttackSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Crouch Attack/Crouch Attack.png")
-        self.jumpAttackSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Attack/Jump Foward Attack.png")
-        self.magic1Sheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Fast Magic/Battlemage Fast magic.png")
-        self.magic2Sheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Sustain Magic/Battlemage Sustain Magic.png")
-        self.magic3Sheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Spin Attack/Battlemage Spin Attack.png")
-        self.deathSheet = pygame.image.load("Assets/Player/Battlemage Complete (Sprite Sheet)/Death/Battlemage Death.png")
 
-        self.posX = position[0]
-        self.posY = position[1]
+        super().__init__(position)
+
+        directory = "Scripts/Player/playerData.json"
+
+        with open(directory, "r") as file:
+            self.jsonData = json.load(file)
+
+
+
+
+        self.idleSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["idleSheet"])
+        self.runSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["runSheet"])
+        self.jumpNeutralSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["jumpNeutralSheet"])
+        self.jumpForwardSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["jumpForwardSheet"])
+        self.crouchSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["crouchSheet"])
+        self.dashSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["dashSheet"])
+        self.attack1Sheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["attack1Sheet"])
+        self.attack2Sheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["attack2Sheet"])
+        self.attack3Sheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["attack3Sheet"])
+        self.crouchAttackSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["crouchAttackSheet"])
+        self.jumpAttackSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["jumpAttackSheet"])
+        self.magic1Sheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["magic1Sheet"])
+        self.magic2Sheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["magic2Sheet"])
+        self.magic3Sheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["magic3Sheet"])
+        self.deathSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["deathSheet"])
+
+
         self.rect = pygame.Rect(self.posX, self.posY, 20, 32)
         self.hurtbox = Collision.hurtBox(self, "PHurtBox", self.rect, 0)
         self.HP = 100
-        self.direction = 1
+
+
         self.refToCurrentAttack = None
         self.leftPressed = False
         self.rightPressed = False
@@ -51,170 +62,60 @@ class Player:
         self.isJumping = False
 
         self.state = "idle"
+        self.animation = "idle"
 
-        self.ForwardAirborneSet = ["jumpForward", "fallForward"]
-        self.NeutralAirborneSet = ["jumpNeutral", "fallNeutral"]
+        self.ForwardAirborneSet = ["jumpForwardUp", "jumpForwardDown", "jumpForwardTransition"]
+        self.NeutralAirborneSet = ["jumpNeutralUp", "jumpNeutralDown", "jumpNeutralTransition"]
 
         self.refToAirborneSet = None
-        self.elapsedFramesInPhase = 0
 
         self.image = self.idleSheet.subsurface(self.idleSheet.get_clip())
         self.rect = self.image.get_rect()
 
         self.rect.topleft = position
 
-        self.frame = 0
-        self.animationTime = 0
-
 
         #states
-        self.idleStates =   {0: (20,19,17,29),
-                             1: (20,67,16,29),
-                             2: (20,115,16,29),
-                             3: (19,161,17,31),
-                             4: (18,209,19,31),
-                             5: (18,257,18,31),
-                             6: (19,305,17,31),
-                             7: (18,355,18,29)
-                            }
+        self.idleClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["idleClips"].items()}
+        self.runClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["runClips"].items()}
+        self.jumpNeutralClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["jumpNeutralClips"].items()}
+        self.jumpForwardClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["jumpForwardClips"].items()}
+        self.dashClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["dashClips"].items()}
 
-        self.runStates =    {0: (19,19,17,29),
-                             1: (18,66,18,30),
-                             2: (16,113,21,31),
-                             3: (15,161,23,31),
-                             4: (14,211,26,29),
-                             5: (16,259,21,29),
-                             6: (16,306,20,30),
-                             7: (16,353,20,31),
-                             8: (16,401,20,31),
-                             9: (18,451,18,29)
-                            }
 
-        self.jumpNeutralStates =    {0: (20,161,14,31),
-                                     1: (20,211,14,29),
-                                     2: (20,259,14,29),
-                                     3: (18,307,17,28),
-                                     4: (16,350,19,32),
-                                     5: (17,395,18,36),
-                                     6: (16,449,19,31),
-                                     7: (16,499,18,29)
-                                    }
-
-        self.fallNeutralStates =    {0: (16,350,19,32),
-                                     1: (17,395,18,36),
-                                     2: (16,449,19,31),
-                                     3: (16,499,18,29)
-                                    }
-
-        self.jumpForwardStates =    {0: (20,65,15,30),
-                                     1: (17,114,20,29),
-                                     2: (16,162,16,26),
-                                     3: (13,153,23,32),
-                                     4: (13,209,22,27),
-                                     5: (17,298,19,37),
-                                     6: (17,344,19,39),
-                                     7: (19,402,19,30),
-                                     8: (18,451,19,29),
-                                     9: (18,498,18,30),
-                                     10: (20,546,16,30)
-                                    }
-
-        self.fallforwardStates =    {0: (13,153,23,32),
-                                     1: (17,298,19,37),
-                                     #2: (17,344,19,39),
-                                     2: (19,402,19,30),
-                                     3: (18,451,19,29)
-                                    }
-
-        self.dashStates =           {0: (17,21,29,27),
-                                     1: (17,67,29,29),
-                                     2: (17,115,29,29),
-                                     3: (17,164,29,28)
-                                    }
-
-        self.stateToSpriteDict =  {"idle": self.idleStates,
-                                   "run": self.runStates,
-                                   "jumpNeutral": self.jumpNeutralStates,
-                                   "jumpForward": self.jumpForwardStates,
-                                   "fallNeutral": self.fallNeutralStates,
-                                   "fallForward": self.fallforwardStates,
-                                   "dash": self.dashStates
+        self.stateToSpriteDict =  {"idle": self.idleClips,
+                                   "run": self.runClips,
+                                   "jumpNeutral": self.jumpNeutralClips,
+                                   "jumpForward": self.jumpForwardClips,
+                                   "dash": self.dashClips
                                   }
         self.stateToSheetDict =   {"idle": self.idleSheet,
                                    "run": self.runSheet,
                                    "jumpNeutral": self.jumpNeutralSheet,
                                    "jumpForward": self.jumpForwardSheet,
-                                   "fallNeutral": self.fallNeutralSheet,
-                                   "fallForward": self.fallForwardSheet,
                                    "dash": self.dashSheet
                                   }
-
-        self.currentFrameWidth = 0
-        self.currentFrameHeight = 0
-
-    def set_state(self, new_state):
-        self.state = new_state
-        self.frame = 0
-        self.animationTime = 0
-        self.elapsedFramesInPhase = 0
-
-    def getCurrentSpriteWidth(self):
-        return self.currentFrameWidth
-
-    def getCurrentSpriteHeight(self):
-        return self.currentFrameHeight
-
-    def getSpriteScale(self):
-        return self.scaleFactor
-
-    def get_frame(self, frame_set, state):
-
-        self.animationTime += 1
-
-        if self.animationTime > 3:
-            self.frame += 1
-            self.animationTime = 0
-
-        if self.frame > (len(frame_set) - 1):
-            self.frame = 0
-
-        self.currentFrameWidth = self.stateToSpriteDict[state][self.frame][2]
-        self.currentFrameHeight = self.stateToSpriteDict[state][self.frame][3]
-        newY = self.posY - (self.currentFrameHeight * self.scaleFactor)
-        newX = 0
-
-        if self.direction == 1:
-            newX = self.posX
-        else:
-            newX = self.posX - (self.currentFrameWidth * self.scaleFactor)
-
-        self.rect = pygame.Rect(newX, newY, self.currentFrameWidth, self.currentFrameHeight)
-
-        return frame_set[self.frame]
+        self.stateToFunctionDict = {"idle": self.idleState,
+                                    "run": self.runState,
+                                    "air": self.airBorneState
+                                   }
 
 
-    def clip(self, clipped_rect, state):
-            if type(clipped_rect) is dict:
-                self.stateToSheetDict[state].set_clip(pygame.Rect(self.get_frame(clipped_rect,state)))
-            else:
-                self.stateToSheetDict[state].set_clip(pygame.Rect(clipped_rect))
 
-            return clipped_rect
 
-    def updateSprite(self, stateToUse, transition = False):
+        for key in self.jsonData["animationData"].keys():
+            self.animationDict[key] = {
+                "frame" : 0,
+                "animationTime": 0,
+                "transition" : False
+            }
 
-        if transition:
-            self.frame = 0
 
-        self.clip(self.stateToSpriteDict[stateToUse], stateToUse)
-        if self.direction == -1:
-            self.image = pygame.transform.flip(self.stateToSheetDict[stateToUse].subsurface(self.stateToSheetDict[stateToUse].get_clip()), True, False)
-        else:
-            self.image = self.stateToSheetDict[stateToUse].subsurface(self.stateToSheetDict[stateToUse].get_clip())
-        #Scaling
-        scaledX = int(self.rect.width * self.scaleFactor)
-        scaledY = int(self.rect.height * self.scaleFactor)
-        self.image = pygame.transform.scale(self.image, (scaledX,scaledY))
+
+
+
+
+
 
     def attackEnded(self):
         self.refToCurrentAttack = None
@@ -239,7 +140,7 @@ class Player:
 
             #jumping
             if event.key == pygame.K_z:
-                print("Jump Released")
+
                 self.jumpPressed = False
             if not self.jumpPressed:
                 self.falling = True
@@ -256,7 +157,7 @@ class Player:
             if pressed[pygame.K_RIGHT]:
                 self.rightPressed = True
             if pressed[pygame.K_z]:
-                print("Jump Pressed")
+
                 self.jumpPressed = True
             if pressed[pygame.K_c]:
                 self.dashPressed = True
@@ -268,24 +169,10 @@ class Player:
         self.rect.x = self.posX
         self.rect.y = self.posY
         self.hurtbox.update()
-        self.elapsedFramesInPhase += 1
-
-        if self.state == "idle":
-            self.idleState()
-        elif self.state == "run":
-            self.runState()
-        elif self.state == "jumpNeutral":
-            self.jumpNeutralState()
-        elif self.state == "fallNeutral":
-            self.fallNeutralState()
-        elif self.state == "jumpForward":
-            self.jumpForwardState()
-        elif self.state == "fallForward":
-            self.fallForwardState()
-        elif self.state == "dash":
-            self.fallForwardState()
-        elif self.state == "air":
-            self.airBorneState()
+        self.elapsedFramesInState += 1
+        
+        self.stateToFunctionDict[self.state]()
+        self.updateSprite()
 
         if self.state == "atk1":
             if self.commitedToAttack != True:
@@ -294,29 +181,24 @@ class Player:
         if self.commitedToAttack == True:
                 self.refToCurrentAttack.update()
 
-    def isGrounded(self):
-        collide = pygame.sprite.spritecollide(self.hurtbox, gameLogicFunctions.collisionGroup, False)
-        if collide:
-            return True
-        else:
-            return False
 
     def idleState(self):
-        self.updateSprite("idle")
-
-
+        if not self.transitionActive:
+            self.set_animation("idle")
 
         if self.jumpPressed:
-            print("idle")
+
             self.isJumping = True
             self.set_state("air")
             if self.leftPressed or self.rightPressed:
                 self.refToAirborneSet = self.ForwardAirborneSet
             else:
                 self.refToAirborneSet = self.NeutralAirborneSet
+            self.set_animation(self.refToAirborneSet[0])
 
         if self.leftPressed or self.rightPressed:
             self.set_state("run")
+            self.set_animation("run", True)
 
     def isGrounded(self):
         collide = pygame.sprite.spritecollide(self.hurtbox, gameLogicFunctions.collisionGroup, False)
@@ -329,28 +211,31 @@ class Player:
 
     def continueGravity(self):
         maxJumpingFrames = 30
+    
 
         if self.isJumping == True:
-            self.updateSprite(self.refToAirborneSet[0])
+            self.set_animation(self.refToAirborneSet[0])
+
             self.yVelocity = self.jumpHeight
 
             if self.jumpPressed == False:
                 self.yVelocity = 0
                 self.isJumping = False
-                self.updateSprite(self.refToAirborneSet[1], True)
+                self.set_animation(self.refToAirborneSet[1], True)
 
-            if self.elapsedFramesInPhase < maxJumpingFrames:
+            if self.elapsedFramesInState < maxJumpingFrames:
                 self.posY -= self.yVelocity
-            elif self.elapsedFramesInPhase >= maxJumpingFrames:
+            elif self.elapsedFramesInState >= maxJumpingFrames:
                 self.isJumping = False
-                self.updateSprite(self.refToAirborneSet[1], True)
+                self.set_animation(self.refToAirborneSet[1], True)
 
         else:
-            self.updateSprite(self.refToAirborneSet[1])
+
             self.posY -= self.yVelocity
             self.yVelocity -= self.yGravity
 
             if self.isGrounded():
+                self.set_animation(self.refToAirborneSet[2], True)
                 return False
         return True
 
@@ -379,7 +264,8 @@ class Player:
             self.posX += 5 * self.direction
         else:
             self.set_state("idle")
-        self.updateSprite("run")
+            self.set_animation("idle",True)
+
         if self.jumpPressed:
             self.isJumping = True
             self.set_state("air")
@@ -387,6 +273,7 @@ class Player:
                 self.refToAirborneSet = self.ForwardAirborneSet
             else:
                 self.refToAirborneSet = self.NeutralAirborneSet
+            self.set_animation(self.refToAirborneSet[0])
 
     def dashState(self):
         self.posX += 15 * self.direction

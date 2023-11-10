@@ -1,0 +1,179 @@
+{
+
+    "spriteSheetDirectory": {
+
+        "idleSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Idle/Battlemage Idle.png",
+        "runSheet"  : "Assets/Player/Battlemage Complete (Sprite Sheet)/Running/Battlemage Run.png",
+        "jumpNeutralSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Neutral/Battlemage Jump Neutral.png",
+        "jumpForwardSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Foward/Battlemage Jump Foward.png",
+        "crouchSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Crouch/Battlemage Crouch.png",
+        "dashSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Dash/Battlemage Dash.png",
+        "attack1Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Attack 1/Battlemage Attack 1.png",
+        "attack2Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Attack 2/Battlemage Attack 2.png",
+        "attack3Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Attack 3/Battlemage Attack 3.png",
+        "crouchAttackSheet": "Assets/Player/Battlemage Complete (Sprite Sheet)/Crouch Attack/Crouch Attack.png",
+        "jumpAttackSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Attack/Jump Foward Attack.png",
+        "magic1Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Fast Magic/Battlemage Fast magic.png",
+        "magic2Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Sustain Magic/Battlemage Sustain Magic.png",
+        "magic3Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Spin Attack/Battlemage Spin Attack.png",
+        "deathSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Death/Battlemage Death.png"
+    },
+
+    "spriteSheetClips": {
+
+        "idleClips" :   {   "0": [20,19,17,29],
+                             "1": [20,67,16,29],
+                             "2": [20,115,16,29],
+                             "3": [19,161,17,31],
+                             "4": [18,209,19,31],
+                             "5": [18,257,18,31],
+                             "6": [19,305,17,31],
+                             "7": [18,355,18,29]
+                            },
+
+        "runClips" :    {"0": [19,19,17,29],
+                             "1": [18,66,18,30],
+                             "2": [16,113,21,31],
+                             "3": [15,161,23,31],
+                             "4": [14,211,26,29],
+                             "5": [16,259,21,29],
+                             "6": [16,306,20,30],
+                             "7": [16,353,20,31],
+                             "8": [16,401,20,31],
+                             "9": [18,451,18,29]
+                            },
+
+        "jumpNeutralClips" :    {     "0" : [19, 68, 16, 28],
+                                     "1" : [19, 117, 15, 27],
+                                     "2": [20,161,16,28],
+                                     "3": [20,211,14,29],
+                                     "4": [20,259,14,29],
+                                     "5": [18,307,17,28],
+                                     "6": [16,350,19,32],
+                                     "7": [17,395,18,36],
+                                     "8": [16,449,19,31],
+                                     "9": [16,499,18,29],
+                                     "10" : [17, 547, 18, 29],
+                                     "11" : [17, 595, 19, 29]
+                                    },
+
+        
+
+        "jumpForwardClips" :    {"0": [20,65,15,30],
+                                     "1": [17,114,20,29],
+                                     "2": [16,162,16,26],
+                                     "3": [13,153,23,32],
+                                     "4": [13,209,22,27],
+                                     "5": [17,298,19,37],
+                                     "6": [17,344,19,39],
+                                     "7": [19,402,19,30],
+                                     "8": [18,451,19,29],
+                                     "9": [18,498,18,30],
+                                     "10":[20,546,16,30]
+                                    },
+
+       
+
+        "dashClips" :              {"0": [17,21,29,27],
+                                     "1": [17,67,29,29],
+                                     "2": [17,115,29,29],
+                                     "3": [17,164,29,28],
+                                     "4": [18, 212, 23, 28],
+                                     "5": [17, 260, 22, 28],
+                                     "6" : [17, 307, 21, 29]
+                                    }
+
+    },
+
+    "animationData": {
+
+        "idle": {
+            "transition" : false,
+            "repeat" : true,
+            "totalFramesBound" : [0,7],
+            "repeatFramesBound" : [0, 7],
+            "clips" : "idle"
+        },
+
+        "run": {
+            "transition" : false,
+            "repeat": true,
+            "totalFramesBound" : [0,9],
+            "repeatFramesBound" : [0, 9],
+            "clips" : "run"
+
+        },
+
+        "jumpNeutralUp" : {
+            "transition" : false,
+            "repeat": false,
+            "totalFramesBound" : [0,4],
+            "repeatFramesBound" : null,
+            "clips" : "jumpNeutral"
+        },
+
+        "jumpNeutralDown": {
+            "transition" : false,
+            "repeat": false,
+            "totalFramesBound" : [5,7],
+            "repeatFramesBound" : null,
+            "clips" : "jumpNeutral"
+
+        },
+
+        "jumpNeutralTransition" : {
+            "transition" : true,
+            "repeat": false,
+            "totalFramesBound" : [8,11],
+            "repeatFramesBound" : null,
+            "clips" : "jumpNeutral"
+        },
+
+        "jumpForwardUp" : {
+            "transition" : false,
+            "repeat": false,
+            "totalFramesBound" : [0,1],
+            "repeatFramesBound" : null,
+            "clips" : "jumpForward"
+        },
+
+        "jumpForwardDown": {
+            "transition" : false,
+            "repeat": false,
+            "totalFramesBound" : [2,6],
+            "repeatFramesBound" : null,
+            "clips" : "jumpForward"
+        },
+
+        "jumpForwardTransition" : {
+            "transition" : true,
+            "repeat": false,
+            "totalFramesBound" : [7,10],
+            "repeatFramesBound" : null,
+            "clips" : "jumpForward"
+        },
+
+        "dashLoop" : {
+            "transition" : false,
+            "repeat": false,
+            "totalFramesBound" : [0,3],
+            "repeatFramesBound" : null,
+            "clips" : "dash"
+        },
+        "dashTransition" : {
+            "transition" : true,
+            "repeat": false,
+            "totalFramesBound" : [4,6],
+            "repeatFramesBound" : null,
+            "clips" : "dash"
+        }
+
+
+
+
+    }
+
+
+
+
+}
