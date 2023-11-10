@@ -5,6 +5,8 @@ import random
 from Scripts.BossScripts.Boss1 import boss1Attacks
 from Scripts.Logic import Collision
 from Scripts.Logic import gameLogicFunctions
+from Scripts import Entity
+import json
 
 
 
@@ -13,11 +15,17 @@ from Scripts.Logic import gameLogicFunctions
 
 
 
-class boss_Crimson(pygame.sprite.Sprite):
+class boss_Crimson(Entity.Entity):
     def __init__(self, position, Player):
 
-        self.posX = position[0]
-        self.posY = position[1]
+
+        super().__init__(position)
+
+        directory = "Scripts/BossScripts/Boss1/boss1Data.json"
+
+        with open(directory, "r") as file:
+            self.jsonData = json.load(file)
+
         self.HP = 100
 
 
@@ -32,8 +40,10 @@ class boss_Crimson(pygame.sprite.Sprite):
 
 
         self.state = "idle"
-        self.direction = 1
+        self.animation = "idle"
 
+
+        self.direction = 1
         self.canJump = True
         self.yVelocity = 1
         self.xVelocity = 0
@@ -45,26 +55,15 @@ class boss_Crimson(pygame.sprite.Sprite):
 
 
 
-        #Sprite Sheet CONTENT
-
-        spriteSheetAttack1 = "Assets/Boss_1/Attack1.png"
-        spriteSheetAttack2 = "Assets/Boss_1/Attack2.png"
-        spriteSheetDeath = "Assets/Boss_1/Death.png"
-        spriteSheetFall = "Assets/Boss_1/Fall.png"
-        spriteSheetIdle = "Assets/Boss_1/Idle.png"
-        spriteSheetJump = "Assets/Boss_1/Jump.png"
-        spriteSheetRun = "Assets/Boss_1/Run.png"
-        spriteSheetHit = "Assets/Boss_1/Take hit.png"
-
         #load images
-        self.sheetAtk1 = pygame.image.load(spriteSheetAttack1)
-        self.sheetAtk2 = pygame.image.load(spriteSheetAttack2)
-        self.sheetDeath = pygame.image.load(spriteSheetDeath)
-        self.sheetFall = pygame.image.load(spriteSheetFall)
-        self.sheetIdle = pygame.image.load(spriteSheetIdle)
-        self.sheetJump = pygame.image.load(spriteSheetJump)
-        self.sheetRun = pygame.image.load(spriteSheetRun)
-        self.sheetHit = pygame.image.load(spriteSheetHit)
+        self.sheetAtk1 = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetAtk1"])
+        self.sheetAtk2 = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetAtk2"])
+        self.sheetDeath = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetDeath"])
+        self.sheetFall = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetFall"])
+        self.sheetIdle = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetIdle"])
+        self.sheetJump = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetJump"])
+        self.sheetRun = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetRun"])
+        self.sheetHit = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetHit"])
 
 
 
@@ -81,21 +80,37 @@ class boss_Crimson(pygame.sprite.Sprite):
 
         self.scaleFactor = 2
 
-        self.atk1_states = {0: (74,107,58,60), 1: (328,98,55,69), 2: (584,91,52,76), 3: (859,88,120,79),4: (1109,52,127,115), 5: (1359,47,127,120), 6: (1609,26,127,141), 7: (1859,47,79,120)}
-        self.atk2_states = {0: (109,58,72,109),1: (334,60,72,107),2: (581,53,75,114),3: (832,45,75, 122),4: (1083,39,160,129), 5: (1338,43,148,131),6: (1592,45,141,135),7: (1859, 81, 66,87)}
+        self.atk1Clips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["atk1Clips"].items()}
+        self.atk2Clips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["atk2Clips"].items()}
 
-        self.death_states = {0: (108,84,45,83), 1: (358,74,52,93), 2: (608,72,66,95), 3: (858,64,96,103), 4: (1108,57,105,110), 5: (1358,45,96,122), 6: (1608,154,105,13)}
-        self.fall_states = {0: (107,81,65,86), 1: (357,74,64,93)}
-        self.idle_states = {0: (108,72, 57, 95), 1: (358,67,56,100), 2: (608,64,56,103), 3: (858,64,56,103), 4: (1108,67,57,100), 5: (1358,63,55,104), 6: (1608,70,54,97), 7: (1858,70,56,97)}
-        self.jump_states = {0: (332,87,78,80)}
-        #self.jump_states = {0: (91,86,69,81), 1: (332,87,78,80)}
-        self.run_states = {0: (94,106,65,61), 1: (342,105,67,62), 2: (592,102,67,65), 3: (839,99,70,68), 4: (1092,106,67,61), 5: (1343,100,66,67), 6: (1594,102,65,65), 7: (1846,100,63,64)}
-        self.hit_states = {0: (106,80,45,87), 1: (358,81,34,86), 2: (608,87,35,80)}
+        self.deathClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["deathClips"].items()}
+        self.fallClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["fallClips"].items()}
+        self.idleClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["idleClips"].items()}
+        self.jumpClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["jumpClips"].items()}
+        self.runClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["runClips"].items()}
+        self.hitClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["hitClips"].items()}
 
-        self.stateToSpriteDict = {"runAround" : self.run_states, "atk1" : self.atk1_states, "atk2" : self.atk2_states, "death" : self.death_states, "fall" : self.fall_states, "idle" : self.idle_states,
-                                  "jump" : self.jump_states, "hit" : self.hit_states}
+        self.stateToSpriteDict = {"runAround" : self.runClips, "atk1" : self.atk1Clips, "atk2" : self.atk2Clips, "death" : self.deathClips, "fall" : self.fallClips, "idle" : self.idleClips,
+                                  "jump" : self.jumpClips, "hit" : self.hitClips}
         self.stateToSheetDict = {"runAround" : self.sheetRun, "atk1" : self.sheetAtk1, "atk2" : self.sheetAtk2, "death" : self.sheetDeath, "fall" : self.sheetFall, "idle": self.sheetIdle,
                                  "jump" : self.sheetJump, "hit" : self.sheetHit}
+        
+        self.stateToFunctionDict = {"idle": self.idleState,
+                                    "runAround": self.runAroundState,
+                                    "jump": self.jumpState,
+                                    "atk1": self.atk1State,
+                                    "atk2": self.atk2State,
+                                    "fireball": self.fireballState
+                                   }
+                                 
+        
+
+        for key in self.stateToSpriteDict.keys():
+            self.animationDict[key] = {
+                "frame" : 0,
+                "animationTime": 0,
+                "transition" : False
+            }
         self.currentFrameWidth = 0
         self.currentFrameHeight = 0
 
@@ -103,98 +118,25 @@ class boss_Crimson(pygame.sprite.Sprite):
 
 
 
-    def set_state(self, new_state):
-        self.state = new_state
-        self.frame = 0
-        self.animationTime = 0
-        self.elapsedFramesInPhase = 0
-        self.xVelocity = 0
-        self.yVelocity = 0
+    
 
 
 
-
-    def getCurrentSpriteWidth(self):
-        return self.currentFrameWidth
-
-
-    def getCurrentSpriteHeight(self):
-        return self.currentFrameHeight
-
-    def getSpriteScale(self):
-        return self.scaleFactor
-
-
-
-    def get_frame(self, frame_set, state):
-        #looping the sprite sequences.q q
-
-        self.animationTime +=1
-
-        if self.animationTime > 3:
-            self.frame +=1
-            self.animationTime = 0
-
-
-        #if loop index is higher that the size of the frame return to the first frame
-        if self.frame > (len(frame_set) - 1):
-            self.frame = 0
-
-
-        self.currentFrameWidth =  currentFrameWidth = self.stateToSpriteDict[state][self.frame][2]
-        self.currentFrameHeight = currentFrameHeight = self.stateToSpriteDict[state][self.frame][3]
-        newY =  self.posY - (currentFrameHeight * self.scaleFactor)
-        newX = 0
-
-        if self.direction == 1:
-            newX = self.posX
-        else:
-            newX = self.posX - (currentFrameWidth * self.scaleFactor)
-
-
-
-        self.rect = pygame.Rect(newX, newY, currentFrameWidth, currentFrameHeight)
-
-
-        return frame_set[self.frame]
-
-    def clip(self, clipped_rect, state):
-        if type(clipped_rect) is dict:
-            self.stateToSheetDict[state].set_clip(pygame.Rect(self.get_frame(clipped_rect,state)))
-        else:
-            self.stateToSheetDict[state].set_clip(pygame.Rect(clipped_rect))
-
-        return clipped_rect
-
-    def updateSprite(self, stateToUse):
-
-        self.clip(self.stateToSpriteDict[stateToUse], stateToUse)
-        if self.direction == -1:
-            self.image = pygame.transform.flip(self.stateToSheetDict[stateToUse].subsurface(self.stateToSheetDict[stateToUse].get_clip()), True, False)
-        else:
-            self.image = self.stateToSheetDict[stateToUse].subsurface(self.stateToSheetDict[stateToUse].get_clip())
-        #Scaling
-        scaledX = int(self.rect.width * self.scaleFactor)
-        scaledY = (self.rect.height * self.scaleFactor)
-        self.image = pygame.transform.scale(self.image, (scaledX,scaledY))
-
-
-
-
-
+    
 
     def runAroundState(self):
 
         MAXTIMEINPHASE = 300
 
-        self.updateSprite("runAround")
+        #self.updateSprite("runAround")
         if self.posX <= 15 or self.posX >= 1200:
             self.direction *= -1
         self.xVelocity = 4 * self.direction
 
         if self.elapsedFramesInPhase >= MAXTIMEINPHASE:
             self.elapsedFramesInPhase = 0
-            self.set_state("fireball")
+            self.xVelocity = 0
+            self.set_state("idle")
 
 
 
@@ -214,11 +156,13 @@ class boss_Crimson(pygame.sprite.Sprite):
                     self.direction = -1
 
                 self.xVelocity = 4 * self.direction
-                self.updateSprite("runAround")
+                self.set_animation("runAround", False)
             else:
 
                 self.commitToAttack = True
                 self.refToCurrentAttack = boss1Attacks.meleeAttack1(self)
+                self.set_animation("atk1")
+                self.xVelocity = 0
         else:
             if (self.refToCurrentAttack == None):
                 self.elapsedFramesInPhase = 0
@@ -226,7 +170,7 @@ class boss_Crimson(pygame.sprite.Sprite):
                 self.set_state("idle")
 
             else:
-                self.updateSprite("atk1")
+                
                 self.refToCurrentAttack.update()
 
     def atk2State(self):
@@ -241,24 +185,24 @@ class boss_Crimson(pygame.sprite.Sprite):
                     self.direction = -1
 
                 self.xVelocity = 4 * self.direction
-                self.updateSprite("runAround")
+                self.set_animation("runAround", False)
             else:
 
                 self.commitToAttack = True
                 self.refToCurrentAttack = boss1Attacks.meleeAttack2(self)
+                self.set_animation("atk2")
+                self.xVelocity = 0
         else:
             if (self.refToCurrentAttack == None):
                 self.commitToAttack = False
                 self.set_state("idle")
-
             else:
-                self.updateSprite("atk2")
+                
                 self.refToCurrentAttack.update()
 
 
 
     def fireballState(self):
-        self.updateSprite("atk2")
 
         if(self.commitToAttack == False):
             self.refToCurrentAttack = boss1Attacks.Fireball(0, 8 *self.direction, True, self)
@@ -283,9 +227,6 @@ class boss_Crimson(pygame.sprite.Sprite):
              self.elapsedFramesInPhase = 40
 
 
-
-
-
          if self.posX <= 15 or self.posX >= 1200:
             self.direction *= -1
          self.xVelocity = 4 * self.direction
@@ -294,12 +235,13 @@ class boss_Crimson(pygame.sprite.Sprite):
                  self.yVelocity = 0
                  self.elapsedFramesInPhase = 0
                  self.set_state("runAround")
+                 self.set_animation("runAround")
              else:
                 self.yVelocity = 5
-                self.updateSprite("fall")
+                self.set_animation("fall", False)
          else:
              self.yVelocity = -5
-             self.updateSprite("jump")
+             self.set_animation("jump", False)
 
 
     def isGrounded(self):
@@ -312,13 +254,14 @@ class boss_Crimson(pygame.sprite.Sprite):
 
     def idleState(self):
         IDLESTATETIME = 120
-        self.updateSprite("idle")
+        self.set_animation("idle")
+        
 
 
         if self.elapsedFramesInPhase >= IDLESTATETIME:
 
             choice = random.randint(0,4)
-            choice = 4
+           
 
             if choice == 0:
                 self.set_state("runAround")
@@ -344,6 +287,7 @@ class boss_Crimson(pygame.sprite.Sprite):
 
     def update(self):
         self.hurtbox.update()
+        self.updateSprite()
 
         self.posX += self.xVelocity
         self.posY += self.yVelocity
@@ -354,18 +298,8 @@ class boss_Crimson(pygame.sprite.Sprite):
             self.set_state("jump")
             self.jumpState(True)
 
-        elif self.state == "runAround":
-            self.runAroundState()
-        elif self.state == "atk1":
-            self.atk1State()
-        elif self.state == "atk2":
-            self.atk2State()
-        elif self.state == "jump":
-            self.jumpState()
-        elif self.state == "fireball":
-            self.fireballState()
-        elif self.state == "idle":
-            self.idleState()
+        self.stateToFunctionDict[self.state]()
+
 
 
         self.elapsedFramesInPhase +=1

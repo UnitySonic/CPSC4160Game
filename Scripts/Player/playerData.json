@@ -5,9 +5,7 @@
         "idleSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Idle/Battlemage Idle.png",
         "runSheet"  : "Assets/Player/Battlemage Complete (Sprite Sheet)/Running/Battlemage Run.png",
         "jumpNeutralSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Neutral/Battlemage Jump Neutral.png",
-        "fallNeutralSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Neutral/Battlemage Jump Neutral.png",
         "jumpForwardSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Foward/Battlemage Jump Foward.png",
-        "fallForwardSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Foward/Battlemage Jump Foward.png",
         "crouchSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Crouch/Battlemage Crouch.png",
         "dashSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Dash/Battlemage Dash.png",
         "attack1Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Attack 1/Battlemage Attack 1.png",
@@ -23,7 +21,7 @@
 
     "spriteSheetClips": {
 
-        "idleStates" :   {   "0": [20,19,17,29],
+        "idleClips" :   {   "0": [20,19,17,29],
                              "1": [20,67,16,29],
                              "2": [20,115,16,29],
                              "3": [19,161,17,31],
@@ -33,7 +31,7 @@
                              "7": [18,355,18,29]
                             },
 
-        "runStates" :    {"0": [19,19,17,29],
+        "runClips" :    {"0": [19,19,17,29],
                              "1": [18,66,18,30],
                              "2": [16,113,21,31],
                              "3": [15,161,23,31],
@@ -45,23 +43,23 @@
                              "9": [18,451,18,29]
                             },
 
-        "jumpNeutralStates" :    {"0": [20,161,14,31],
-                                     "1": [20,211,14,29],
-                                     "2": [20,259,14,29],
-                                     "3": [18,307,17,28],
-                                     "4": [16,350,19,32],
-                                     "5": [17,395,18,36],
-                                     "6": [16,449,19,31],
-                                     "7": [16,499,18,29]
+        "jumpNeutralClips" :    {     "0" : [19, 68, 16, 28],
+                                     "1" : [19, 117, 15, 27],
+                                     "2": [20,161,16,28],
+                                     "3": [20,211,14,29],
+                                     "4": [20,259,14,29],
+                                     "5": [18,307,17,28],
+                                     "6": [16,350,19,32],
+                                     "7": [17,395,18,36],
+                                     "8": [16,449,19,31],
+                                     "9": [16,499,18,29],
+                                     "10" : [17, 547, 18, 29],
+                                     "11" : [17, 595, 19, 29]
                                     },
 
-        "fallNeutralStates" :    {"0": [16,350,19,32],
-                                     "1": [17,395,18,36],
-                                     "2": [16,449,19,31],
-                                     "3": [16,499,18,29]
-                                    },
+        
 
-        "jumpForwardStates" :    {"0": [20,65,15,30],
+        "jumpForwardClips" :    {"0": [20,65,15,30],
                                      "1": [17,114,20,29],
                                      "2": [16,162,16,26],
                                      "3": [13,153,23,32],
@@ -71,20 +69,18 @@
                                      "7": [19,402,19,30],
                                      "8": [18,451,19,29],
                                      "9": [18,498,18,30],
-                                     "10": [20,546,16,30]
+                                     "10":[20,546,16,30]
                                     },
 
-        "fallForwardStates" :    {"0": [13,153,23,32],
-                                     "1": [17,298,19,37],
-                                     "2": [17,344,19,39],
-                                     "3": [19,402,19,30],
-                                     "4": [18,451,19,29]
-                                    },
+       
 
-        "dashStates" :              {"0": [17,21,29,27],
+        "dashClips" :              {"0": [17,21,29,27],
                                      "1": [17,67,29,29],
                                      "2": [17,115,29,29],
-                                     "3": [17,164,29,28]
+                                     "3": [17,164,29,28],
+                                     "4": [18, 212, 23, 28],
+                                     "5": [17, 260, 22, 28],
+                                     "6" : [17, 307, 21, 29]
                                     }
 
     },
@@ -92,47 +88,86 @@
     "animationData": {
 
         "idle": {
+            "transition" : false,
             "repeat" : true,
-            "transitionOutBound" : null,
-            "repeatFramesBound" : [0, 7]
+            "totalFramesBound" : [0,7],
+            "repeatFramesBound" : [0, 7],
+            "clips" : "idle"
         },
 
         "run": {
+            "transition" : false,
             "repeat": true,
-            "transitionOutBound" : null,
-            "repeatFramesBound" : [0, 9]
+            "totalFramesBound" : [0,9],
+            "repeatFramesBound" : [0, 9],
+            "clips" : "run"
 
         },
 
-        "jumpNeutral" : {
+        "jumpNeutralUp" : {
+            "transition" : false,
             "repeat": false,
-            "transitionOutBound" : null,
-            "repeatFramesBound" : null
+            "totalFramesBound" : [0,4],
+            "repeatFramesBound" : null,
+            "clips" : "jumpNeutral"
         },
 
-        "jumpForward" : {
-            "repeat" : false,
-            "transitionOutBound" : null,
-            "repeatFramesBound" : null
+        "jumpNeutralDown": {
+            "transition" : false,
+            "repeat": false,
+            "totalFramesBound" : [5,7],
+            "repeatFramesBound" : null,
+            "clips" : "jumpNeutral"
+
         },
 
-        "fallNeutral": {
-            "repeat": true,
-            "transitionOutBound" :  null,
-            "repeatFramesBound" : [0,3]
+        "jumpNeutralTransition" : {
+            "transition" : true,
+            "repeat": false,
+            "totalFramesBound" : [8,11],
+            "repeatFramesBound" : null,
+            "clips" : "jumpNeutral"
         },
 
-        "fallForward" : {
-            "repeat" : false,
-            "transitionOutBound" : null,
-            "repeatFramesBound" : null
+        "jumpForwardUp" : {
+            "transition" : false,
+            "repeat": false,
+            "totalFramesBound" : [0,1],
+            "repeatFramesBound" : null,
+            "clips" : "jumpForward"
         },
 
-        "dash" : {
-            "repeat" : true,
-            "transitionOutBound" : [0,7],
-            "repeatFramesBound" : [0, 3]
+        "jumpForwardDown": {
+            "transition" : false,
+            "repeat": false,
+            "totalFramesBound" : [2,6],
+            "repeatFramesBound" : null,
+            "clips" : "jumpForward"
+        },
+
+        "jumpForwardTransition" : {
+            "transition" : true,
+            "repeat": false,
+            "totalFramesBound" : [7,10],
+            "repeatFramesBound" : null,
+            "clips" : "jumpForward"
+        },
+
+        "dashLoop" : {
+            "transition" : false,
+            "repeat": false,
+            "totalFramesBound" : [0,3],
+            "repeatFramesBound" : null,
+            "clips" : "dash"
+        },
+        "dashTransition" : {
+            "transition" : true,
+            "repeat": false,
+            "totalFramesBound" : [4,6],
+            "repeatFramesBound" : null,
+            "clips" : "dash"
         }
+
 
 
 

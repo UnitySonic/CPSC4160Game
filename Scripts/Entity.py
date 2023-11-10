@@ -21,6 +21,7 @@ class Entity:
         self.isJumping = False
 
         self.elapsedFramesInState = 0
+        self.transitionActive = False
 
 
 
@@ -50,11 +51,9 @@ class Entity:
         self.elapsedFramesInState = 0
 
 
-    def set_animation(self, newAnim):
-        self.animationDict[self.animation]["frame"] = 0
-        self.animationDict[self.animation]["animationTime"] = 0
-        self.animationDict[self.animation]["transition"] = False
-
+    def set_animation(self, newAnim, reset = False):
+        if reset:
+            self.resetAnimation(self.animation)
         self.animation = newAnim
 
 
@@ -77,42 +76,48 @@ class Entity:
     def getSpriteScale(self):
         return self.scaleFactor
 
-    def get_frame(self, frame_set, state):
+    def updateframe(self, currentAnimation):
 
-        repeat = self.jsonData["animationData"][state]["repeat"]
-        transitionOutBound = self.jsonData["animationData"][state]["transitionOutBound"]
-        repeatBound = self.jsonData["animationData"][state]["repeatFramesBound"]
+       
+        #Loading JSON ANIMATION DATA!
+        self.transitionActive = self.jsonData["animationData"][currentAnimation]["transition"]
+        repeat = self.jsonData["animationData"][currentAnimation]["repeat"]
+        frameBound = self.jsonData["animationData"][currentAnimation]["totalFramesBound"]
+        repeatBound = self.jsonData["animationData"][currentAnimation]["repeatFramesBound"]
+        clipsToUse = self.jsonData["animationData"][currentAnimation]["clips"]
 
-        animationTime = self.animationDict[state]["animationTime"]
-        currentFrame = self.animationDict[state]["frame"]
+        
+        #Time to proceed
+        frame_set = self.stateToSpriteDict[clipsToUse]
+        animationTime = self.animationDict[currentAnimation]["animationTime"]
+        currentFrame = self.animationDict[currentAnimation]["frame"]
+
+        if currentFrame < frameBound[0]:
+            currentFrame = self.animationDict[currentAnimation]["frame"] = frameBound[0]
+            
 
 
+
+        transitionOut = False
         animationTime +=1
-
         if animationTime > 3:
             currentFrame += 1
-
             animationTime = 0
 
-        #print("before")
-        #print(self.animationDict[state]["frame"])
+        if currentFrame > frameBound[1]:
+            if self.transitionActive:
+                transitionOut = True
+                currentFrame = frameBound[1]
+            elif repeat:  
+                if currentFrame > repeatBound[1]:
+                    currentFrame = repeatBound[0]
+            else:
+                currentFrame = frameBound[1]
 
 
 
-        if repeat:
-            if currentFrame > repeatBound[1]:
-                currentFrame = repeatBound[0]
-        elif currentFrame > (int(len(frame_set)) -1):
-            currentFrame= int(len(self.stateToSpriteDict[state] )- 1)
-
-
-        #print("after")
-        #print(self.animationDict[state]["frame"])
-
-
-
-        self.currentFrameWidth = self.stateToSpriteDict[state][currentFrame][2]
-        self.currentFrameHeight = self.stateToSpriteDict[state][currentFrame][3]
+        self.currentFrameWidth = self.stateToSpriteDict[clipsToUse][currentFrame][2]
+        self.currentFrameHeight = self.stateToSpriteDict[clipsToUse][currentFrame][3]
         newY = self.posY - (self.currentFrameHeight * self.scaleFactor)
         newX = 0
 
@@ -124,10 +129,15 @@ class Entity:
         self.rect = pygame.Rect(newX, newY, self.currentFrameWidth, self.currentFrameHeight)
 
 
-        self.stateToSheetDict[state].set_clip(pygame.Rect(frame_set[currentFrame]))
+        self.stateToSheetDict[clipsToUse].set_clip(pygame.Rect(frame_set[currentFrame]))
 
-        self.animationDict[state]["frame"] = currentFrame
-        self.animationDict[state]["animationTime"] = animationTime
+       
+
+        self.animationDict[currentAnimation]["frame"] = currentFrame
+        self.animationDict[currentAnimation]["animationTime"] = animationTime
+        if transitionOut:
+            self.resetAnimation(currentAnimation)
+            self.transitionActive = False
 
 
 
@@ -135,16 +145,13 @@ class Entity:
 
 
     def updateSprite(self):
+        sheetName = clipsToUse = self.jsonData["animationData"][self.animation]["clips"]
 
-
-        stateToUse = self.animation
-
-
-        self.get_frame(self.stateToSpriteDict[stateToUse], stateToUse)
+        self.updateframe(self.animation)
         if self.direction == -1:
-            self.image = pygame.transform.flip(self.stateToSheetDict[stateToUse].subsurface(self.stateToSheetDict[stateToUse].get_clip()), True, False)
+            self.image = pygame.transform.flip(self.stateToSheetDict[sheetName].subsurface(self.stateToSheetDict[sheetName].get_clip()), True, False)
         else:
-            self.image = self.stateToSheetDict[stateToUse].subsurface(self.stateToSheetDict[stateToUse].get_clip())
+            self.image = self.stateToSheetDict[sheetName].subsurface(self.stateToSheetDict[sheetName].get_clip())
         #Scaling
         scaledX = int(self.rect.width * self.scaleFactor)
         scaledY = int(self.rect.height * self.scaleFactor)
