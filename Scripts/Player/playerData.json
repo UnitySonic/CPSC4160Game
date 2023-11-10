@@ -1,0 +1,144 @@
+{
+
+    "spriteSheetDirectory": {
+
+        "idleSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Idle/Battlemage Idle.png",
+        "runSheet"  : "Assets/Player/Battlemage Complete (Sprite Sheet)/Running/Battlemage Run.png",
+        "jumpNeutralSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Neutral/Battlemage Jump Neutral.png",
+        "fallNeutralSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Neutral/Battlemage Jump Neutral.png",
+        "jumpForwardSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Foward/Battlemage Jump Foward.png",
+        "fallForwardSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Foward/Battlemage Jump Foward.png",
+        "crouchSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Crouch/Battlemage Crouch.png",
+        "dashSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Dash/Battlemage Dash.png",
+        "attack1Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Attack 1/Battlemage Attack 1.png",
+        "attack2Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Attack 2/Battlemage Attack 2.png",
+        "attack3Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Attack 3/Battlemage Attack 3.png",
+        "crouchAttackSheet": "Assets/Player/Battlemage Complete (Sprite Sheet)/Crouch Attack/Crouch Attack.png",
+        "jumpAttackSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Jump Attack/Jump Foward Attack.png",
+        "magic1Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Fast Magic/Battlemage Fast magic.png",
+        "magic2Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Sustain Magic/Battlemage Sustain Magic.png",
+        "magic3Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Spin Attack/Battlemage Spin Attack.png",
+        "deathSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Death/Battlemage Death.png"
+    },
+
+    "spriteSheetClips": {
+
+        "idleStates" :   {   "0": [20,19,17,29],
+                             "1": [20,67,16,29],
+                             "2": [20,115,16,29],
+                             "3": [19,161,17,31],
+                             "4": [18,209,19,31],
+                             "5": [18,257,18,31],
+                             "6": [19,305,17,31],
+                             "7": [18,355,18,29]
+                            },
+
+        "runStates" :    {"0": [19,19,17,29],
+                             "1": [18,66,18,30],
+                             "2": [16,113,21,31],
+                             "3": [15,161,23,31],
+                             "4": [14,211,26,29],
+                             "5": [16,259,21,29],
+                             "6": [16,306,20,30],
+                             "7": [16,353,20,31],
+                             "8": [16,401,20,31],
+                             "9": [18,451,18,29]
+                            },
+
+        "jumpNeutralStates" :    {"0": [20,161,14,31],
+                                     "1": [20,211,14,29],
+                                     "2": [20,259,14,29],
+                                     "3": [18,307,17,28],
+                                     "4": [16,350,19,32],
+                                     "5": [17,395,18,36],
+                                     "6": [16,449,19,31],
+                                     "7": [16,499,18,29]
+                                    },
+
+        "fallNeutralStates" :    {"0": [16,350,19,32],
+                                     "1": [17,395,18,36],
+                                     "2": [16,449,19,31],
+                                     "3": [16,499,18,29]
+                                    },
+
+        "jumpForwardStates" :    {"0": [20,65,15,30],
+                                     "1": [17,114,20,29],
+                                     "2": [16,162,16,26],
+                                     "3": [13,153,23,32],
+                                     "4": [13,209,22,27],
+                                     "5": [17,298,19,37],
+                                     "6": [17,344,19,39],
+                                     "7": [19,402,19,30],
+                                     "8": [18,451,19,29],
+                                     "9": [18,498,18,30],
+                                     "10": [20,546,16,30]
+                                    },
+
+        "fallForwardStates" :    {"0": [13,153,23,32],
+                                     "1": [17,298,19,37],
+                                     "2": [17,344,19,39],
+                                     "3": [19,402,19,30],
+                                     "4": [18,451,19,29]
+                                    },
+
+        "dashStates" :              {"0": [17,21,29,27],
+                                     "1": [17,67,29,29],
+                                     "2": [17,115,29,29],
+                                     "3": [17,164,29,28]
+                                    }
+
+    },
+
+    "animationData": {
+
+        "idle": {
+            "repeat" : true,
+            "transitionOutBound" : null,
+            "repeatFramesBound" : [0, 7]
+        },
+
+        "run": {
+            "repeat": true,
+            "transitionOutBound" : null,
+            "repeatFramesBound" : [0, 9]
+
+        },
+
+        "jumpNeutral" : {
+            "repeat": false,
+            "transitionOutBound" : null,
+            "repeatFramesBound" : null
+        },
+
+        "jumpForward" : {
+            "repeat" : false,
+            "transitionOutBound" : null,
+            "repeatFramesBound" : null
+        },
+
+        "fallNeutral": {
+            "repeat": true,
+            "transitionOutBound" :  null,
+            "repeatFramesBound" : [0,3]
+        },
+
+        "fallForward" : {
+            "repeat" : false,
+            "transitionOutBound" : null,
+            "repeatFramesBound" : null
+        },
+
+        "dash" : {
+            "repeat" : true,
+            "transitionOutBound" : [0,7],
+            "repeatFramesBound" : [0, 3]
+        }
+
+
+
+    }
+
+
+
+
+}
