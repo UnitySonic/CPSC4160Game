@@ -39,7 +39,10 @@ class Player(Entity.Entity):
 
 
         self.rect = pygame.Rect(self.posX, self.posY, 20, 32)
-        self.hurtbox = Collision.hurtBox(self, "PHurtBox", self.rect, 0)
+
+
+        #In adobe, I used a bounding box of width 10 to help set pivot points for Cyline
+        self.hurtbox = Collision.hurtBox(self, "PHurtBox", pygame.Rect(self.posX, self.posY, 40, 70), 10)
         self.HP = 100
 
 
@@ -54,7 +57,13 @@ class Player(Entity.Entity):
         self.scaleFactor = 2.5
         self.yGravity = 1
         self.jumpHeight = 8
+        
         self.yVelocity = 15
+        self.airDashPhysicsOn = False
+
+
+
+
         self.currentSprite = 0
         self.originalposY = self.posY
         self.dashCooldown = 1000
@@ -73,6 +82,8 @@ class Player(Entity.Entity):
         self.rect = self.image.get_rect()
 
         self.rect.topleft = position
+
+        
 
 
         #states
@@ -97,7 +108,8 @@ class Player(Entity.Entity):
                                   }
         self.stateToFunctionDict = {"idle": self.idleState,
                                     "run": self.runState,
-                                    "air": self.airBorneState
+                                    "air": self.airBorneState,
+                                    "dash" : self.dashState
                                    }
 
 
@@ -168,11 +180,12 @@ class Player(Entity.Entity):
     def update(self):
         self.rect.x = self.posX
         self.rect.y = self.posY
-        self.hurtbox.update()
+        
         self.elapsedFramesInState += 1
         
         self.stateToFunctionDict[self.state]()
         self.updateSprite()
+        self.hurtbox.update()
 
         if self.state == "atk1":
             if self.commitedToAttack != True:
@@ -186,7 +199,13 @@ class Player(Entity.Entity):
         if not self.transitionActive:
             self.set_animation("idle")
 
-        if self.jumpPressed:
+
+        
+        if self.dashPressed:
+            self.set_state("dash")
+            self.set_animation("dash", True)
+
+        elif self.jumpPressed:
 
             self.isJumping = True
             self.set_state("air")
@@ -196,7 +215,7 @@ class Player(Entity.Entity):
                 self.refToAirborneSet = self.NeutralAirborneSet
             self.set_animation(self.refToAirborneSet[0])
 
-        if self.leftPressed or self.rightPressed:
+        elif self.leftPressed or self.rightPressed:
             self.set_state("run")
             self.set_animation("run", True)
 
@@ -245,17 +264,27 @@ class Player(Entity.Entity):
         if self.continueGravity() == False:
             self.jumpPressed = False
             self.set_state("idle")
+            self.airDashPhysicsOn = False
+            self.dashPressed = False
+
+        airSpeed = 5 if self.airDashPhysicsOn == False else 10
+        
+        
+        
         if self.leftPressed:
             self.direction = -1
-            self.posX += 5 * self.direction
+            self.posX += airSpeed * self.direction
         elif self.rightPressed:
             self.direction = 1
-            self.posX += 5 * self.direction
+            self.posX += airSpeed * self.direction
 
 
 
 
     def runState(self):
+
+
+        #Moving left and Right
         if self.leftPressed:
             self.direction = -1
             self.posX += 5 * self.direction
@@ -265,8 +294,13 @@ class Player(Entity.Entity):
         else:
             self.set_state("idle")
             self.set_animation("idle",True)
+        
 
-        if self.jumpPressed:
+        if self.dashPressed:
+            self.set_state("dash")
+            self.set_animation("dash", True)
+            
+        elif self.jumpPressed:
             self.isJumping = True
             self.set_state("air")
             if self.leftPressed or self.rightPressed:
@@ -276,5 +310,28 @@ class Player(Entity.Entity):
             self.set_animation(self.refToAirborneSet[0])
 
     def dashState(self):
-        self.posX += 15 * self.direction
-        self.updateSprite("dash")
+        dashDuration = 40
+
+        if self.elapsedFramesInState > dashDuration:
+            self.set_animation("dashTransition", True)
+            self.set_state("idle")
+            self.dashPressed = False
+            return
+        
+
+        if self.leftPressed:
+            self.direction = -1
+        elif self.rightPressed:
+            self.direction = 1 
+        
+        
+        self.posX += 10 * self.direction
+        self.set_animation("dash")
+
+
+        if self.jumpPressed:
+            self.airDashPhysicsOn = True
+            self.refToAirborneSet = self.ForwardAirborneSet
+            self.set_state("air")
+            self.set_animation(self.refToAirborneSet[1])
+            self.isJumping = True

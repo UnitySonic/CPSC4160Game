@@ -29,6 +29,7 @@ class Entity:
 
 
 
+
         self.currentFrameWidth = 0
         self.currentFrameHeight = 0
         self.scaleFactor = 1
@@ -115,21 +116,46 @@ class Entity:
                 currentFrame = frameBound[1]
 
 
+        
+        self.currentFrameWidth = self.stateToSpriteDict[clipsToUse][currentFrame][2] 
+        self.currentFrameHeight = self.stateToSpriteDict[clipsToUse][currentFrame][3] 
+        
+        if len(frame_set[currentFrame]) > 4:
+            framePosX = self.stateToSpriteDict[clipsToUse][currentFrame][0]
+            framePosY = self.stateToSpriteDict[clipsToUse][currentFrame][1]
+            pivotX = self.stateToSpriteDict[clipsToUse][currentFrame][4]
+            pivotY = self.stateToSpriteDict[clipsToUse][currentFrame][5]
 
-        self.currentFrameWidth = self.stateToSpriteDict[clipsToUse][currentFrame][2]
-        self.currentFrameHeight = self.stateToSpriteDict[clipsToUse][currentFrame][3]
-        newY = self.posY - (self.currentFrameHeight * self.scaleFactor)
-        newX = 0
+            newPivotX = (pivotX - framePosX) * self.scaleFactor
+            newPivotY = (pivotY - framePosY) * self.scaleFactor
 
-        if self.direction == 1:
-            newX = self.posX
+            if self.direction == 1:
+                newX = self.posX - newPivotX
+                newY = self.posY - newPivotY
+ 
+            else:
+                scaledWidth = self.currentFrameWidth * self.scaleFactor                
+                newPivotX = (((scaledWidth)-1)-newPivotX) 
+
+                newX = self.posX - newPivotX
+                newY = self.posY - newPivotY
+        
         else:
-            newX = self.posX - (self.currentFrameWidth * self.scaleFactor)
+            newY = self.posY - (self.currentFrameHeight * self.scaleFactor)
+            newX = 0
+
+            if self.direction == 1:
+                newX = self.posX
+            else:
+                newX = self.posX - (self.currentFrameWidth * self.scaleFactor)
+      
 
         self.rect = pygame.Rect(newX, newY, self.currentFrameWidth, self.currentFrameHeight)
 
-
-        self.stateToSheetDict[clipsToUse].set_clip(pygame.Rect(frame_set[currentFrame]))
+        if len(frame_set[currentFrame]) <= 4:
+            self.stateToSheetDict[clipsToUse].set_clip(pygame.Rect(frame_set[currentFrame]))
+        else:
+            self.stateToSheetDict[clipsToUse].set_clip(pygame.Rect(frame_set[currentFrame][:4]))
 
        
 
