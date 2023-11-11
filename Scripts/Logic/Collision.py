@@ -74,34 +74,15 @@ class hurtBox(pygame.sprite.Sprite):
     def getEntity(self):
         return self.parent
 
-    def update(self):
+    def update(self,):
         #In the future we'll have to just set up our sprite sheets to contain hurtbox data.
 
         parentPosX = self.parent.posX
         parentPosY = self.parent.posY
-        parentRectX = self.parent.rect.x
-        parentRectY = self.parent.rect.y
 
-        parentSpriteWidth = self.parent.getCurrentSpriteWidth()
-        parentSpriteHeight = self.parent.getCurrentSpriteHeight()
-
-
-
-        scale = self.parent.getSpriteScale()
-
-        newX = 0
-        newY = parentPosY-100
-
-        offset = 0.15
-
-        if parentRectX != parentPosX:
-            newX = parentRectX + parentSpriteWidth *float(1-offset)
-        else:
-            newX = parentRectX + parentSpriteWidth*offset
-
-
-
-
+    
+        newX = parentPosX - (self.rect.width//2)
+        newY = parentPosY -self.rect.height
         self.rect = pygame.Rect(newX, newY, self.rect.width, self.rect.height)
 
 

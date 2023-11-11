@@ -50,7 +50,7 @@ class boss_Crimson(Entity.Entity):
 
 
 
-
+        ##Usually used a box of width 24/26 for setting crimson pivots in adobe
         self.hurtbox = Collision.hurtBox(self, "EHurtBox", pygame.Rect(self.posX, self.posY, 50, 100), 10)
 
 
@@ -261,6 +261,7 @@ class boss_Crimson(Entity.Entity):
         if self.elapsedFramesInPhase >= IDLESTATETIME:
 
             choice = random.randint(0,4)
+            choice = 4
            
 
             if choice == 0:
@@ -291,6 +292,8 @@ class boss_Crimson(Entity.Entity):
 
         self.posX += self.xVelocity
         self.posY += self.yVelocity
+
+      
 
 
 

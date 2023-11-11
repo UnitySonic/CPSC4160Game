@@ -199,6 +199,6 @@ while run:
     npc_sprites.draw(screen)
 
     pygame.display.flip()
-    clock.tick(20)
+    clock.tick(60)
 
 pygame.quit()
