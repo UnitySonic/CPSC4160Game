@@ -3,12 +3,14 @@ import os
 import time
 from Scripts.Player.Player import Player
 from npc import NPC
+from Scripts.Logic import gameLogicFunctions
+from Scripts.Logic import Collision
 
 pygame.init()
 
 clock = pygame.time.Clock()
 
-FPS = 60
+FPS = 50
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -44,6 +46,12 @@ main_character.image = pygame.transform.scale(main_character.image, (new_width, 
 # Update the player's rect to match the new dimensions
 main_character.rect = main_character.image.get_rect()
 main_character.rect.topleft = (400, 350)
+
+
+groundDimensions = pygame.Rect(-100,600,SCREEN_WIDTH + 200, 120)
+groundCollision = Collision.collisionBox(groundDimensions, 0)
+
+
 
 # adds in the NPC instances
 npc1 = NPC(650, 350, 250, 150, move_range=1, speed=.2)
@@ -92,7 +100,6 @@ dialogue_texts = [
 
 run = True
 while run:
-    clock.tick(FPS)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -106,25 +113,7 @@ while run:
     key = pygame.key.get_pressed()
     main_character.update()
 
-    if key[pygame.K_LEFT] and scroll > 0:
-        main_character.update()
-        scroll -= character_speed
-
-    if key[pygame.K_RIGHT] and scroll < 1200:
-        main_character.update()
-        scroll += character_speed
-
-    # Vertical movement (up and down keys)
-    # Press z to jump
-    if key[pygame.K_UP]:
-        main_character.handle_event(pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_z}))
-
-    # Press c to Dash (WIP)
-    if key[pygame.K_DOWN]:
-        main_character.handle_event(pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_c}))
-
-    # Ensure the player's vertical position is within ground level bounds
-    main_character.posY = min(max(main_character.posY, 350), SCREEN_HEIGHT - main_character.getCurrentSpriteHeight())
+    
 
     # Limit the character's movement to stay within screen bounds
     if scroll < 0:
@@ -143,6 +132,8 @@ while run:
     # Check if the player crosses the position to transition to a new file
     if main_character.rect.right > 1100:
 
+
+        gameLogicFunctions.clearGroups()
         # Transition to the new file (testvill.py)
         import mainScript
 
@@ -199,6 +190,8 @@ while run:
     npc_sprites.draw(screen)
 
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(FPS)
+    
+
 
 pygame.quit()

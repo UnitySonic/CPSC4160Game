@@ -1,5 +1,7 @@
 import pygame
 import sys
+import os
+import time
 from Scripts.Logic import gameLogicFunctions
 from Scripts.Player import Player
 from Scripts.BossScripts.Boss1 import boss1
@@ -57,17 +59,22 @@ def collisionDetection():
                 if collisionType == "PHitToEHit":
                     #Hitbox to Hitbox check (Priortize player)
                     playerBox.handleCollision( collisionType, enemyBox)
+                    #print("PhitToEHit Detected")
                 elif collisionType == "PHitToEHurt":
                     enemyBox.getEntity().handleCollision(collisionType, playerBox)
+                    #print("PhitToEHurt Detected")
                 elif collisionType == "PHurtToEHit":
                     playerBox.getEntity().handleCollision(collisionType, enemyBox)
+                    #print("PHurtToEHit Detected")
                 elif collisionType == "PHurtToEHurt":
                     #player priortize
                     playerBox.getEntity().handleCollision(collisionType, enemyBox)
+                    #print("PhurtToEHurt Detected")
                 else:
                     pass
                 playerBox.handleCollision(collisionType, enemyBox)
 
+pygame.init()
 while gameOver != True:
 
 
@@ -79,6 +86,16 @@ while gameOver != True:
 
     #Stage Select
 
+    font = pygame.font.Font(None, 36)
+
+
+    textBossHP = font.render("Hello, Pygame!", True, (255, 255, 255)) 
+    textBossHP_rect = textBossHP.get_rect()
+    textBossHP_rect.center = (screen_width - 100, 30)
+
+    textPlayerHP = font.render("Hello, Pygame!", True, (255, 255, 255)) 
+    textPlayerHP_rect = textPlayerHP.get_rect()
+    textPlayerHP_rect.center = (100, 30)
 
     if stageSelect == "Boss1":
         drawCollision = False
@@ -101,10 +118,10 @@ while gameOver != True:
 
         player = Player.Player((300,600))
         boss = boss1.boss_Crimson((400, 400), player)
-        boss2 = boss2.boss_Demon((200,200), player)
+        #boss2 = boss2.boss_Demon((200,200), player)
         gameLogicFunctions.addEntity(player)
         gameLogicFunctions.addEntity(boss)
-        gameLogicFunctions.addEntity(boss2)
+        #gameLogicFunctions.addEntity(boss2)
 
         while stageOver != True:
             for event in pygame.event.get():
@@ -131,6 +148,11 @@ while gameOver != True:
 
 
             collisionDetection()
+            textBossHP = font.render(f"BOSS HP: {boss.HP}", True, (255, 255, 255))  # True enables anti-aliasing, (255, 255, 255) is white
+            textPlayerHP = font.render(f"PLAYER HP: {player.HP}", True, (255, 255, 255))  # True enables anti-aliasing, (255, 255, 255) is white
+
+            screen.blit(textPlayerHP, textPlayerHP_rect)
+            screen.blit(textBossHP,textBossHP_rect)
 
             for entity in gameLogicFunctions.entityList:
                 entity.update()
@@ -141,7 +163,7 @@ while gameOver != True:
                         for hitbox in entity.hitboxes.values():
                             pygame.draw.rect(screen, (255,255,255), hitbox.rect)
                             if hitbox.rect.x < -10 or hitbox.rect.y > 2000:
-                                gameLogicFunctions.removeEntity(entity)
+                                hitbox.forceKillHitBox()
                     else:
                         pygame.draw.rect(screen, (255,255,255), entity.hurtbox.rect)
 
@@ -153,11 +175,13 @@ while gameOver != True:
             pygame.display.flip()
 
             #gameLogicFunctions.clearGroups()
-            clock.tick(60)
+            clock.tick(50)
+            fps = clock.get_fps()
+            #print(f"FPS: {fps:.2f}")
 
 
 
-#eur
+
 
 
 

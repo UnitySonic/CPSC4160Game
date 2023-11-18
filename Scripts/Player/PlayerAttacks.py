@@ -2,73 +2,116 @@ import pygame
 
 #from  Scripts.Logic import Attack
 from  Scripts.Logic import Collision
+from  Scripts.Logic import Attack
 
 
-class meleeAttack1():
+class meleeAttack1(Attack.Attack):
     def __init__(self, parentEntity):
+        super().__init__(parentEntity)
 
-        self.parent = parentEntity
-        self.hitboxes = {}
-        self.cleanUpQueue = []
 
-        self.attackWidth = 50
-        self.attackHeight = 100
+        self.attackWidth = 63
+        self.attackHeight = 85
         self.attackType = "PHitBox"
 
 
-        hitbox1 = Collision.hitbox(1, self, pygame.Rect(0,0,self.attackWidth, self.attackHeight), "None",  0,  10, 3,  0, 200)
+        hitbox1 = Collision.hitbox(1, self, pygame.Rect(0,0,self.attackWidth, self.attackHeight), "None",  0,  10, 1,  8, 9)
         self.hitboxes[1] = hitbox1
 
-    def clear(self):
-        for hitbox in self.hitboxes.values():
-            del(hitbox)
-
-    def recalculateHitbox(self):
-        attackStartY = self.parent.posY + 40
-        attackStartX = 0
-
-
-        self.directionFaced = self.parent.direction
-
-        if self.directionFaced == 1:
-            attackStartX = self.parent.posX + 10
+        self.horiOffset = 20
+        self.vertOffset = 80
+    
+    def canCancel(self):
+        if len(self.hitboxes) == 0:
+            return True
         else:
-            attackStartX = self.parent.posX - 10 - self.attackWidth
-
-        self.hitboxes[1].rect.x = attackStartX
-        self.hitboxes[1].rect.y = attackStartY
-
-        return
+            return (self.hitboxes[1].delay <= 0)
 
 
-
-    def signal(self, ID):
-        self.cleanUpQueue.append(ID)
-
-    def cleanUp(self):
-        # Assuming self.hitboxes is a dictionary
-        for ID in self.cleanUpQueue:
-            del self.hitboxes[ID]
-
-    def getAttackType(self):
-        return self.attackType
+class meleeAttack2(Attack.Attack):
+    def __init__(self, parentEntity):
+        super().__init__(parentEntity)
 
 
+        self.attackWidth = 63
+        self.attackHeight = 85
+        self.attackType = "PHitBox"
 
 
-    def update(self):
-        if len(self.hitboxes) > 0:
-            for hitbox in self.hitboxes.values():
-
-                self.recalculateHitbox()
-                hitbox.update()
-            self.cleanUp()
-
+        hitbox1 = Collision.hitbox(1, self, pygame.Rect(0,0,self.attackWidth, self.attackHeight), "None",  0,  10, 2,  8, 9)
+        self.hitboxes[1] = hitbox1
+        self.horiOffset = 20
+        self.vertOffset = 80
+    
+    def canCancel(self):
+        if len(self.hitboxes) == 0:
+            return True
         else:
-            self.parent.attackEnded()
+            return (self.hitboxes[1].delay <= 0)
+  
 
-    def __del__ (self):
-        pass
+class meleeAttack3(Attack.Attack):
+    def __init__(self, parentEntity):
+        super().__init__(parentEntity)
+
+
+        self.attackWidth = 60
+        self.attackHeight = 90
+        self.attackType = "PHitBox"
+        self.horiOffset = 20
+        self.vertOffset = 80
+
+
+        hitbox1 = Collision.hitbox(1, self, pygame.Rect(0,0,self.attackWidth, self.attackHeight), "None",  0,  10, 3,  11, 9)
+        self.hitboxes[1] = hitbox1
+    def canCancel(self):
+        if len(self.hitboxes) == 0:
+            return True
+        else:
+            return (self.hitboxes[1].delay <= 0)
+
+
+
+class crouchAttack(Attack.Attack):
+    def __init__(self, parentEntity):
+        super().__init__(parentEntity)
+
+
+        self.attackWidth = 60
+        self.attackHeight = 90
+        self.attackType = "PHitBox"
+        self.horiOffset = 20
+        self.vertOffset = 80
+
+
+        hitbox1 = Collision.hitbox(1, self, pygame.Rect(0,0,self.attackWidth, self.attackHeight), "None",  0,  10, 0,  11, 9)
+        self.hitboxes[1] = hitbox1
+    def canCancel(self):
+        if len(self.hitboxes) == 0:
+            return True
+        else:
+            return (self.hitboxes[1].delay <= 0)
+
+
+class airAttack(Attack.Attack):
+    def __init__(self, parentEntity):
+        super().__init__(parentEntity)
+
+
+        self.attackWidth = 60
+        self.attackHeight = 90
+        self.attackType = "PHitBox"
+        self.horiOffset = 20
+        self.vertOffset = 80
+
+
+        hitbox1 = Collision.hitbox(1, self, pygame.Rect(0,0,self.attackWidth, self.attackHeight), "None",  0,  10, 1,  4, 8)
+        self.hitboxes[1] = hitbox1
+    def canCancel(self):
+        if len(self.hitboxes) == 0:
+            return True
+        else:
+            return (self.hitboxes[1].delay <= 0)
 
 
 

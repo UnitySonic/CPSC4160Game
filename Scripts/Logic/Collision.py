@@ -35,29 +35,32 @@ class hitbox(pygame.sprite.Sprite):
         elif self.remainingFrames > 0:
             self.remainingFrames -= 1
         else:
-           self.killHitBox()
+           self.signalToKillHitBox()
 
-    def killHitBox(self):
-        gameLogicFunctions.removeBoxFromGroup(self.attackRef.getAttackType(), self)
+    def signalToKillHitBox(self):
         self.attackRef.signal(self.ID)
+    
+    def forceKillHitBox(self):
+        gameLogicFunctions.removeBoxFromGroup(self.attackRef.getAttackType(), self)
+    
+    def getDelay(self):
+        return self.delay
+
 
 
 
     def handleCollision(self, CollisionType, OffendingHitbox):
         if CollisionType == "PHitToEHit":
             if self.priority > OffendingHitbox.priority:
-                OffendingHitbox.killHitBox()
+                OffendingHitbox.forceKillHitBox()
             elif self.priority <= OffendingHitbox.priority:
-                self.killHitBox()
+                self.signalToKillHitBox()
         if CollisionType == "PHitToEHurt":
                 OffendingHitbox.getEntity().handleCollision(CollisionType, self)
 
 
 
-
-
-    def __del__ (self):
-        pass
+    
 
 
 class hurtBox(pygame.sprite.Sprite):
