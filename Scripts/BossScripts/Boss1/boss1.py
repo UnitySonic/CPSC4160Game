@@ -36,7 +36,7 @@ class boss_Crimson(Entity.Entity):
         self.attackIDCounter = 0
 
 
-        self.elapsedFramesInPhase = 0
+        self.elapsedFramesInState = 0
 
 
         self.state = "idle"
@@ -47,6 +47,8 @@ class boss_Crimson(Entity.Entity):
         self.canJump = True
         self.yVelocity = 1
         self.xVelocity = 0
+
+        self.priorityLastHitBy = -1
 
 
 
@@ -89,6 +91,7 @@ class boss_Crimson(Entity.Entity):
         self.jumpClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["jumpClips"].items()}
         self.runClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["runClips"].items()}
         self.hitClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["hitClips"].items()}
+        
 
         self.stateToSpriteDict = {"runAround" : self.runClips, "atk1" : self.atk1Clips, "atk2" : self.atk2Clips, "death" : self.deathClips, "fall" : self.fallClips, "idle" : self.idleClips,
                                   "jump" : self.jumpClips, "hit" : self.hitClips}
@@ -100,7 +103,9 @@ class boss_Crimson(Entity.Entity):
                                     "jump": self.jumpState,
                                     "atk1": self.atk1State,
                                     "atk2": self.atk2State,
-                                    "fireball": self.fireballState
+                                    "fireball": self.fireballState,
+                                    "hit" : self.hurtState,
+                                    "death" : self.deathState
                                    }
                                  
         
@@ -127,14 +132,15 @@ class boss_Crimson(Entity.Entity):
     def runAroundState(self):
 
         MAXTIMEINPHASE = 300
+        
 
         #self.updateSprite("runAround")
         if self.posX <= 15 or self.posX >= 1200:
             self.direction *= -1
         self.xVelocity = 4 * self.direction
 
-        if self.elapsedFramesInPhase >= MAXTIMEINPHASE:
-            self.elapsedFramesInPhase = 0
+        if self.elapsedFramesInState >= MAXTIMEINPHASE:
+            self.elapsedFramesInState = 0
             self.xVelocity = 0
             self.set_state("idle")
 
@@ -165,12 +171,12 @@ class boss_Crimson(Entity.Entity):
                 self.xVelocity = 0
         else:
             if (self.refToCurrentAttack == None):
-                self.elapsedFramesInPhase = 0
+                self.elapsedFramesInState = 0
                 self.commitToAttack = False
                 self.set_state("idle")
+                self.set_animation("idle", True)
 
             else:
-                
                 self.refToCurrentAttack.update()
 
     def atk2State(self):
@@ -196,6 +202,7 @@ class boss_Crimson(Entity.Entity):
             if (self.refToCurrentAttack == None):
                 self.commitToAttack = False
                 self.set_state("idle")
+                self.set_animation("idle", True)
             else:
                 
                 self.refToCurrentAttack.update()
@@ -210,6 +217,7 @@ class boss_Crimson(Entity.Entity):
         else:
             if(self.refToCurrentAttack == None):
                 self.set_state("idle")
+                self.set_animation("idle", True)
                 self.commitToAttack = False
             else:
                 self.refToCurrentAttack.update()
@@ -224,18 +232,18 @@ class boss_Crimson(Entity.Entity):
 
     def jumpState(self, beginFall = False):
          if beginFall == True:
-             self.elapsedFramesInPhase = 40
+             self.elapsedFramesInState = 40
 
 
          if self.posX <= 15 or self.posX >= 1200:
             self.direction *= -1
          self.xVelocity = 4 * self.direction
-         if self.elapsedFramesInPhase >= 40:
+         if self.elapsedFramesInState >= 40:
              if self.isGrounded():
                  self.yVelocity = 0
-                 self.elapsedFramesInPhase = 0
+                 self.elapsedFramesInState = 0
                  self.set_state("runAround")
-                 self.set_animation("runAround")
+                 self.set_animation("runAround", True)
              else:
                 self.yVelocity = 5
                 self.set_animation("fall", False)
@@ -258,14 +266,15 @@ class boss_Crimson(Entity.Entity):
         
 
 
-        if self.elapsedFramesInPhase >= IDLESTATETIME:
+        if self.elapsedFramesInState >= IDLESTATETIME:
 
             choice = random.randint(0,4)
-            choice = 4
+            choice = 3
+        
            
-
             if choice == 0:
                 self.set_state("runAround")
+                self.set_animation("runAround", True)
             elif choice == 1:
                 self.set_state("atk1")
             elif choice == 2:
@@ -276,12 +285,44 @@ class boss_Crimson(Entity.Entity):
                 self.set_state("jump")
 
 
+    def hurtState(self):
+        hurtStateTime = 100
+
+        self.xVelocity = 0
+
+        if self.elapsedFramesInState > hurtStateTime:
+            self.set_state("idle")
+            self.set_animation("idle", True)
+            self.priorityLastHitBy = -1
+    
+    
+    
+    def deathState(self):
+        self.xVelocity = 0
+
+       
+
+
 
         #Two Aspects of this Phase, Running Left and Right, and Jumping
     def handleCollision(self, CollisionType, Box):
 
         if CollisionType  == "PHitToEHurt":
-            self.HP = self.HP - Box.damage
+            if self.priorityLastHitBy == -1:
+                self.set_state("hit")
+                self.set_animation("hit", True)
+
+            if Box.priority > self.priorityLastHitBy:
+                self.HP = self.HP - Box.damage
+                self.priorityLastHitBy = Box.priority
+                if self.HP <= 0:
+                    self.set_state("death")
+                    self.set_animation("death")
+                
+                
+
+
+            
 
 
 
@@ -305,6 +346,6 @@ class boss_Crimson(Entity.Entity):
 
 
 
-        self.elapsedFramesInPhase +=1
+        self.elapsedFramesInState +=1
 
     #Start of State functions

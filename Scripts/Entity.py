@@ -25,11 +25,6 @@ class Entity:
 
 
 
-
-
-
-
-
         self.currentFrameWidth = 0
         self.currentFrameHeight = 0
         self.scaleFactor = 1
@@ -67,6 +62,13 @@ class Entity:
         self.animationDict[animID]["animationTime"] = 0
         self.animationDict[animID]["transition"] = False
 
+    def resetAllAnimation(self):
+        for animID in self.animationDict.keys():
+            self.animationDict[animID]["frame"] = 0
+            self.animationDict[animID]["animationTime"] = 0
+            self.animationDict[animID]["transition"] = False
+
+
 
     def getCurrentSpriteWidth(self):
         return self.currentFrameWidth
@@ -91,6 +93,8 @@ class Entity:
         #Time to proceed
         frame_set = self.stateToSpriteDict[clipsToUse]
         animationTime = self.animationDict[currentAnimation]["animationTime"]
+        animationTimeUpperBound = self.jsonData["animationData"][currentAnimation]["framesPerSprite"]
+        
         currentFrame = self.animationDict[currentAnimation]["frame"]
 
         if currentFrame < frameBound[0]:
@@ -101,7 +105,7 @@ class Entity:
 
         transitionOut = False
         animationTime +=1
-        if animationTime > 3:
+        if animationTime > animationTimeUpperBound:
             currentFrame += 1
             animationTime = 0
 

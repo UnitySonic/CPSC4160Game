@@ -85,6 +85,7 @@
             "repeat" : true,
             "totalFramesBound" : [0,7],
             "repeatFramesBound" : [0, 7],
+            "framesPerSprite" : 3,
             "clips" : "idle"
         },
 
@@ -93,6 +94,7 @@
             "repeat": true,
             "totalFramesBound" : [0,7],
             "repeatFramesBound" : [0, 7],
+            "framesPerSprite" : 3,
             "clips" : "runAround"
         },
 
@@ -101,6 +103,7 @@
             "repeat": false,
             "totalFramesBound" : [0,1],
             "repeatFramesBound" : [0,1],
+            "framesPerSprite" : 3,
             "clips" : "jump"
         },
 
@@ -109,6 +112,7 @@
             "repeat" : false,
             "totalFramesBound" : [0,2],
             "repeatFramesBound" : null,
+            "framesPerSprite" : 3,
             "clips" : "hit"
         },
 
@@ -117,6 +121,7 @@
             "repeat": false,
             "totalFramesBound" : [0,1],
             "repeatFramesBound" : [0,1],
+            "framesPerSprite" : 3,
             "clips" : "fall"
         },
 
@@ -125,6 +130,7 @@
             "repeat" : false,
             "totalFramesBound" : [0,6],
             "repeatFramesBound" : [0,6],
+            "framesPerSprite" : 3,
             "clips" : "death"
         },
 
@@ -133,6 +139,7 @@
             "repeat" : false,
             "totalFramesBound" : [0,7],
             "repeatFramesBound" : null,
+            "framesPerSprite" : 3,
             "clips" : "atk1"
         },
         "atk2": {
@@ -140,6 +147,7 @@
             "repeat" : false,
             "totalFramesBound" : [0,7],
             "repeatFramesBound" : null,
+            "framesPerSprite" : 3,
             "clips" : "atk2"
         },
 
@@ -148,6 +156,7 @@
             "repeat" : false,
             "totalFramesBound" : [0,2],
             "repeatFramesBound" : null,
+            "framesPerSprite" : 3,
             "clips" : "atk2"
         }
 

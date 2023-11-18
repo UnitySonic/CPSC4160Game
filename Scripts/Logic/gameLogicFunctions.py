@@ -20,6 +20,8 @@ def clearGroups():
     playerHurtBoxGroup.empty()
     enemyHitBoxGroup.empty()
     enemyHurtBoxGroup.empty()
+    collisionGroup.empty()
+    entityList.clear()
 
 def addBoxToGroup(type, sprite):
     if type == "PHitBox":
@@ -61,7 +63,7 @@ def detectCollision():
 
     returnDictionary = {}
 
-    returnDictionary["PHitToEhit"] = collisionsPHitToEHit
+    returnDictionary["PHitToEHit"] = collisionsPHitToEHit
     returnDictionary["PHitToEHurt"] = collisionsPHitToEHurt
 
     returnDictionary["PHurtToEHit"] = collisionsPHurtToEHit

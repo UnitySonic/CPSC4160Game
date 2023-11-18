@@ -4,20 +4,23 @@ import pygame
 from  Scripts.Logic import Collision
 from Scripts.Logic import gameLogicFunctions
 
-class meleeAttack1():
+from Scripts.Logic import Attack
+
+
+
+class meleeAttack1(Attack.Attack):
     def __init__(self, parentEntity):
 
-        self.parent = parentEntity
-        self.hitboxes = {}
-        self.cleanUpQueue = []
+        super().__init__(parentEntity)
 
+      
 
         self.attackWidth = 200
-        self.attackHeight = 220
+        self.attackHeight = 320
         self.attackType = "EHitBox"
 
 
-        attackStartY = self.parent.posY - 220
+        attackStartY = self.parent.posY - self.attackHeight
         attackStartX = 0
 
 
@@ -33,45 +36,17 @@ class meleeAttack1():
         hitbox1 = Collision.hitbox(1, self, rect1, "None",  0,  10, 3,  10, 32)
         self.hitboxes[1] = hitbox1
 
-    def clear(self):
-        for hitbox in self.hitboxes.values():
-            del(hitbox)
-
-
-    def signal(self, ID):
-        self.cleanUpQueue.append(ID)
-
-    def cleanUp(self):
-        # Assuming self.hitboxes is a dictionary
-        for ID in self.cleanUpQueue:
-            del self.hitboxes[ID]
-
-    def getAttackType(self):
-        return self.attackType
 
 
 
 
-    def update(self):
-        if len(self.hitboxes) > 0:
-            for hitbox in self.hitboxes.values():
-                hitbox.update()
-            self.cleanUp()
 
-        else:
-            self.parent.attackEnded()
-
-    def __del__ (self):
-        pass
-
-
-
-class meleeAttack2():
+class meleeAttack2(Attack.Attack):
     def __init__(self, parentEntity):
 
-        self.parent = parentEntity
-        self.hitboxes = {}
-        self.cleanUpQueue = []
+        super().__init__(parentEntity)
+
+        
 
         self.attackWidth = 200
         self.attackHeight = 200
@@ -93,22 +68,6 @@ class meleeAttack2():
         hitbox1 = Collision.hitbox(1, self, rect1, "None",  0,  10, 3,  11, 32)
         self.hitboxes[1] = hitbox1
 
-    def clear(self):
-        for hitbox in self.hitboxes.values():
-            del(hitbox)
-
-
-    def signal(self, ID):
-        self.cleanUpQueue.append(ID)
-
-    def cleanUp(self):
-        # Assuming self.hitboxes is a dictionary
-        for ID in self.cleanUpQueue:
-            del self.hitboxes[ID]
-
-    def getAttackType(self):
-        return self.attackType
-
 
 
 
@@ -121,15 +80,15 @@ class meleeAttack2():
         else:
             self.parent.attackEnded()
 
-    def __del__ (self):
-        pass
 
 
-class Fireball():
+class Fireball(Attack.Attack):
     def __init__(self, rise, run, split, parentEntity = None, position = None, attackWidth = None, attackHeight = None):
 
-        self.hitboxes = {}
-        self.cleanUpQueue = []
+        super().__init__(parentEntity)
+
+
+
         self.attackType = "EHitBox"
         self.split = split
 
@@ -166,31 +125,21 @@ class Fireball():
             attackStartX = position[0]
             attackStartY = position[1]
             self.autoMode = True
+        
+
+        if self.split:
+            priority = 3
+        else:
+            priority = 0
 
         rect1 = pygame.Rect(attackStartX, attackStartY, self.attackWidth, self.attackHeight)
-        hitbox1 = Collision.hitbox(0, self, rect1, "None",  0,  10, 3,  10, 9999)
+        hitbox1 = Collision.hitbox(0, self, rect1, "None",  0,  10, priority,  0, 9999)
         self.hitboxes[0] = hitbox1
 
         gameLogicFunctions.addEntity(self)
 
 
 
-
-    def clear(self):
-        for hitbox in self.hitboxes.values():
-            del(hitbox)
-
-
-    def signal(self, ID):
-        self.cleanUpQueue.append(ID)
-
-    def cleanUp(self):
-        # Assuming self.hitboxes is a dictionary
-        for ID in self.cleanUpQueue:
-            del self.hitboxes[ID]
-
-    def getAttackType(self):
-        return self.attackType
 
 
 
@@ -214,22 +163,13 @@ class Fireball():
 
 
 
-            self.hitboxes[0].killHitBox()
+            self.hitboxes[0].forceKillHitBox()
             gameLogicFunctions.removeEntity(self)
             del self
         else:
             hitbox = self.hitboxes[0]
             hitbox.rect = pygame.Rect(hitbox.rect.left + self.run, hitbox.rect.top + self.rise, hitbox.rect.width, hitbox.rect.height)
-
             hitbox.update()
-
-
-
-
-
-
-    def __del__ (self):
-        pass
 
 
 
