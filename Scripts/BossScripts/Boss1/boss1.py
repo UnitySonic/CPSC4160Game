@@ -26,7 +26,7 @@ class boss_Crimson(Entity.Entity):
         with open(directory, "r") as file:
             self.jsonData = json.load(file)
 
-        self.HP = 100
+        self.HP = 150
 
 
         self.playerRef = Player
@@ -135,7 +135,7 @@ class boss_Crimson(Entity.Entity):
 
     def runAroundState(self):
 
-        MAXTIMEINPHASE = 300
+        MAXTIMEINPHASE = 160
         
 
         #self.updateSprite("runAround")

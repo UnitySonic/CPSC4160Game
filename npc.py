@@ -52,9 +52,9 @@ class NPC(pygame.sprite.Sprite):
 
         # Move the NPC within its defined range
         self.current_position += self.direction * self.speed
-        if self.current_position > self.rect.x + self.move_range:
+        if self.current_position > 1100:
             self.direction = -1
-        elif self.current_position < self.rect.x - self.move_range:
+        elif self.current_position < 200:
             self.direction = 1
 
         self.rect.x = self.current_position

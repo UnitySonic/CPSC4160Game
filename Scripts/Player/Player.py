@@ -181,29 +181,30 @@ class Player(Entity.Entity):
                     self.set_state("death")
                 else:
                     self.set_state("hurt")
+                    
                 
                 if self.refToCurrentAttack is not None:
                     self.refToCurrentAttack.clear()
                     self.refToCurrentAttack = None
 
 
-                    posXToCheck = None
-                    if Box.getEntity() == None:
-                        posXToCheck = Box.rect.centerx
-                    else:
-                        posXToCheck = Box.getEntity().posX
+                posXToCheck = None
+                if Box.getEntity() == None:
+                    posXToCheck = Box.rect.centerx
+                else:
+                    posXToCheck = Box.getEntity().posX
 
 
-                    if self.posX < posXToCheck:
-                        if self.direction == 1:
-                            self.set_animation("hitBack", True)
-                        else:
-                            self.set_animation("hitForward", True)
+                if self.posX < posXToCheck:
+                    if self.direction == 1:
+                        self.set_animation("hitBack", True)
                     else:
-                        if self.direction == 1:
-                            self.set_animation("hitForward", True)
-                        else:
-                            self.set_animation("hitBack", True)
+                        self.set_animation("hitForward", True)
+                else:
+                    if self.direction == 1:
+                        self.set_animation("hitForward", True)
+                    else:
+                        self.set_animation("hitBack", True)
                     
 
 
@@ -329,12 +330,13 @@ class Player(Entity.Entity):
             
             if self.refToCurrentAttack is not None:
                 self.refToCurrentAttack.clear()
-            self.refToCurrentAttack = None
+                self.refToCurrentAttack = None
 
             self.set_state("idle")
             self.airDashPhysicsOn = False
             self.dashPressed = False
             return
+
         airSpeed = 5 if self.airDashPhysicsOn == False else 10
         
         

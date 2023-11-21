@@ -161,7 +161,7 @@ while gameOver != True:
                 else:
                     if hasattr(entity, "hitboxes"):
                         for hitbox in entity.hitboxes.values():
-                            pygame.draw.rect(screen, (255,255,255), hitbox.rect)
+                            pygame.draw.rect(screen, (51,0,51), hitbox.rect)
                             if hitbox.rect.x < -10 or hitbox.rect.y > 2000:
                                 hitbox.forceKillHitBox()
                     else:
