@@ -44,7 +44,8 @@ class Player(Entity.Entity):
 
 
         #In adobe, I used a bounding box of width 10 to help set pivot points for Cyline
-        self.hurtbox = Collision.hurtBox(self, "PHurtBox", pygame.Rect(self.posX, self.posY, 40, 70), 10)
+        self.hurtbox = Collision.hurtBox(self, "PHurtBox", pygame.Rect(self.posX, self.posY, 40, 70), 0)
+        self.groundCheckBox = Collision.groundCheckBox(self,pygame.Rect(self.posX, self.posY, 20, 1))
         self.HP = 100
 
 
@@ -180,7 +181,20 @@ class Player(Entity.Entity):
                     self.set_state("death")
                 else:
                     self.set_state("hurt")
-                    if self.posX < Box.getEntity().posX:
+                
+                if self.refToCurrentAttack is not None:
+                    self.refToCurrentAttack.clear()
+                    self.refToCurrentAttack = None
+
+
+                    posXToCheck = None
+                    if Box.getEntity() == None:
+                        posXToCheck = Box.rect.centerx
+                    else:
+                        posXToCheck = Box.getEntity().posX
+
+
+                    if self.posX < posXToCheck:
                         if self.direction == 1:
                             self.set_animation("hitBack", True)
                         else:
@@ -243,21 +257,23 @@ class Player(Entity.Entity):
 
         if self.invinFrames > 0:
             self.invinFrames -= 1
+        
+        
 
 
         self.stateToFunctionDict[self.state]()
+
+        if self.isGrounded() == False:
+            print("Not grounded")
+            #self.continueGravity()
         self.updateSprite()
         self.hurtbox.update()
+        self.groundCheckBox.update()
 
       
 
 
-    def isGrounded(self):
-        collide = pygame.sprite.spritecollide(self.hurtbox, gameLogicFunctions.collisionGroup, False)
-        if collide:
-            return True
-        else:
-            return False
+  
     
     
         
@@ -299,6 +315,7 @@ class Player(Entity.Entity):
             self.yVelocity -= self.yGravity
 
             if self.isGrounded():
+                print("grounded")
                 self.set_animation(self.refToAirborneSet[2], True)
                 return False
         return True

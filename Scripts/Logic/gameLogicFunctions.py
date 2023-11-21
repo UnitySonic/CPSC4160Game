@@ -1,13 +1,22 @@
 import pygame
+import json
+
+
 playerHitBoxGroup = pygame.sprite.Group()
 playerHurtBoxGroup = pygame.sprite.Group()
-
 enemyHitBoxGroup = pygame.sprite.Group()
 enemyHurtBoxGroup = pygame.sprite.Group()
-
 collisionGroup = pygame.sprite.Group()
-
 entityList = []
+
+
+#JSON DATA
+
+directory = "Scripts/BossScripts/Boss1/boss1Data.json"
+boss1Data = None
+
+with open(directory, "r") as file:
+     boss1Data = json.load(file)
 
 
 def addEntity(entity):

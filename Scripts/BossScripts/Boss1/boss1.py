@@ -54,6 +54,7 @@ class boss_Crimson(Entity.Entity):
 
         ##Usually used a box of width 24/26 for setting crimson pivots in adobe
         self.hurtbox = Collision.hurtBox(self, "EHurtBox", pygame.Rect(self.posX, self.posY, 50, 100), 10)
+        self.groundCheckBox = Collision.groundCheckBox(self, pygame.Rect(self.posX, self.posY, 25, 5))
 
 
 
@@ -66,6 +67,7 @@ class boss_Crimson(Entity.Entity):
         self.sheetJump = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetJump"])
         self.sheetRun = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetRun"])
         self.sheetHit = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetHit"])
+        self.sheetTeleport = pygame.image.load(self.jsonData["spriteSheetDirectory"]["spriteSheetTeleport"])
 
 
 
@@ -91,12 +93,13 @@ class boss_Crimson(Entity.Entity):
         self.jumpClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["jumpClips"].items()}
         self.runClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["runClips"].items()}
         self.hitClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["hitClips"].items()}
+        self.teleportClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["teleportClips"].items()}
         
 
         self.stateToSpriteDict = {"runAround" : self.runClips, "atk1" : self.atk1Clips, "atk2" : self.atk2Clips, "death" : self.deathClips, "fall" : self.fallClips, "idle" : self.idleClips,
-                                  "jump" : self.jumpClips, "hit" : self.hitClips}
+                                  "jump" : self.jumpClips, "hit" : self.hitClips, "teleport" : self.teleportClips}
         self.stateToSheetDict = {"runAround" : self.sheetRun, "atk1" : self.sheetAtk1, "atk2" : self.sheetAtk2, "death" : self.sheetDeath, "fall" : self.sheetFall, "idle": self.sheetIdle,
-                                 "jump" : self.sheetJump, "hit" : self.sheetHit}
+                                 "jump" : self.sheetJump, "hit" : self.sheetHit, "teleport" : self.sheetTeleport}
         
         self.stateToFunctionDict = {"idle": self.idleState,
                                     "runAround": self.runAroundState,
@@ -105,12 +108,13 @@ class boss_Crimson(Entity.Entity):
                                     "atk2": self.atk2State,
                                     "fireball": self.fireballState,
                                     "hit" : self.hurtState,
-                                    "death" : self.deathState
+                                    "death" : self.deathState,
+                                    "teleport" : self.teleportState
                                    }
                                  
         
 
-        for key in self.stateToSpriteDict.keys():
+        for key in self.jsonData["animationData"].keys():
             self.animationDict[key] = {
                 "frame" : 0,
                 "animationTime": 0,
@@ -137,7 +141,8 @@ class boss_Crimson(Entity.Entity):
         #self.updateSprite("runAround")
         if self.posX <= 15 or self.posX >= 1200:
             self.direction *= -1
-        self.xVelocity = 4 * self.direction
+        self.moveEntity(4*self.direction, 0)
+        
 
         if self.elapsedFramesInState >= MAXTIMEINPHASE:
             self.elapsedFramesInState = 0
@@ -154,21 +159,15 @@ class boss_Crimson(Entity.Entity):
         if self.commitToAttack == False:
             distance = self.rect.centerx - self.playerRef.rect.centerx
 
+            if (distance < 0):
+                self.direction = 1
+            if(distance > 0):
+                self.direction = -1
 
-            if abs(distance) > 60:
-                if (distance < 0):
-                    self.direction = 1
-                if(distance > 0):
-                    self.direction = -1
-
-                self.xVelocity = 4 * self.direction
-                self.set_animation("runAround", False)
-            else:
-
-                self.commitToAttack = True
-                self.refToCurrentAttack = boss1Attacks.meleeAttack1(self)
-                self.set_animation("atk1")
-                self.xVelocity = 0
+            self.commitToAttack = True
+            self.refToCurrentAttack = boss1Attacks.meleeAttack1(self)
+            self.set_animation("atk1")
+            self.xVelocity = 0
         else:
             if (self.refToCurrentAttack == None):
                 self.elapsedFramesInState = 0
@@ -180,39 +179,56 @@ class boss_Crimson(Entity.Entity):
                 self.refToCurrentAttack.update()
 
     def atk2State(self):
-        if self.commitToAttack == False:
+        if self.refToCurrentAttack == None:
             distance = self.rect.centerx - self.playerRef.rect.centerx
+            if (distance < 0):
+                self.direction = 1
+            if(distance >= 0):
+                self.direction = -1
 
-
-            if abs(distance) > 60:
-                if (distance < 0):
-                    self.direction = 1
-                if(distance > 0):
-                    self.direction = -1
-
-                self.xVelocity = 4 * self.direction
-                self.set_animation("runAround", False)
-            else:
-
-                self.commitToAttack = True
-                self.refToCurrentAttack = boss1Attacks.meleeAttack2(self)
-                self.set_animation("atk2")
-                self.xVelocity = 0
+            self.refToCurrentAttack = boss1Attacks.meleeAttack2(self)
+            self.set_animation("atk2")
         else:
+            self.refToCurrentAttack.update()
             if (self.refToCurrentAttack == None):
-                self.commitToAttack = False
                 self.set_state("idle")
                 self.set_animation("idle", True)
+    
+    def teleportState(self):
+        VANISHTIMER = 120
+        self.set_animation("teleport")
+        self.hurtbox.disableHurtBox()
+
+        if self.elapsedFramesInState > VANISHTIMER:
+            self.hurtbox.enableHurtBox()
+            self.direction *= -1
+
+
+            self.moveEntityPosition(self.playerRef.posX - 150 * self.direction, self.posY)
+
+            choice = random.randint(0,2)
+
+            if choice == 2:
+                self.set_state("atk2")
             else:
-                
-                self.refToCurrentAttack.update()
+                self.set_state("atk1")
+            self.resetAnimation("teleport")
+            
+
+
+
+
+
+
+
 
 
 
     def fireballState(self):
 
         if(self.commitToAttack == False):
-            self.refToCurrentAttack = boss1Attacks.Fireball(0, 8 *self.direction, True, self)
+            self.refToCurrentAttack = boss1Attacks.Fireball("fireball1", None, self, None, self.direction)
+            self.set_animation("fireball", True)
             self.commitToAttack = True
         else:
             if(self.refToCurrentAttack == None):
@@ -235,41 +251,37 @@ class boss_Crimson(Entity.Entity):
              self.elapsedFramesInState = 40
 
 
-         if self.posX <= 15 or self.posX >= 1200:
+         if self.posX <= 15 and self.direction == -1 or self.posX >= 1200 and self.direction == 1:
             self.direction *= -1
-         self.xVelocity = 4 * self.direction
+
+         self.moveEntity(4 * self.direction, 0)
          if self.elapsedFramesInState >= 40:
              if self.isGrounded():
-                 self.yVelocity = 0
                  self.elapsedFramesInState = 0
-                 self.set_state("runAround")
-                 self.set_animation("runAround", True)
+                 self.set_state("atk2")
+                 self.set_animation("atk2", True)
+                 
              else:
-                self.yVelocity = 5
+                self.moveEntity(0, 3)
                 self.set_animation("fall", False)
          else:
-             self.yVelocity = -5
+             self.moveEntity(0, -3)
              self.set_animation("jump", False)
 
 
-    def isGrounded(self):
-        collide = pygame.sprite.spritecollide(self.hurtbox, gameLogicFunctions.collisionGroup, False)
-        if collide:
-            return True
-        else:
-            return False
+    
 
 
     def idleState(self):
         IDLESTATETIME = 120
         self.set_animation("idle")
         
-
+       
 
         if self.elapsedFramesInState >= IDLESTATETIME:
 
             choice = random.randint(0,4)
-            choice = 3
+            
         
            
             if choice == 0:
@@ -278,11 +290,13 @@ class boss_Crimson(Entity.Entity):
             elif choice == 1:
                 self.set_state("atk1")
             elif choice == 2:
-                self.set_state("atk2")
-            elif choice == 3:
                 self.set_state("fireball")
-            elif choice == 4:
+            elif choice == 3:
                 self.set_state("jump")
+            elif choice == 4:
+                self.set_state("teleport")
+                self.set_animation("teleport", True)
+            
 
 
     def hurtState(self):
@@ -308,7 +322,7 @@ class boss_Crimson(Entity.Entity):
     def handleCollision(self, CollisionType, Box):
 
         if CollisionType  == "PHitToEHurt":
-            if self.priorityLastHitBy == -1:
+            if self.refToCurrentAttack == None and self.state is not "hit":
                 self.set_state("hit")
                 self.set_animation("hit", True)
 
@@ -328,15 +342,7 @@ class boss_Crimson(Entity.Entity):
 
 
     def update(self):
-        self.hurtbox.update()
         self.updateSprite()
-
-        self.posX += self.xVelocity
-        self.posY += self.yVelocity
-
-      
-
-
 
         if self.isGrounded() == False and self.yVelocity>0:
             self.set_state("jump")

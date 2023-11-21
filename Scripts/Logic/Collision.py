@@ -77,7 +77,7 @@ class hurtBox(pygame.sprite.Sprite):
     def getEntity(self):
         return self.parent
 
-    def update(self,):
+    def update(self):
         #In the future we'll have to just set up our sprite sheets to contain hurtbox data.
 
         parentPosX = self.parent.posX
@@ -96,13 +96,37 @@ class hurtBox(pygame.sprite.Sprite):
         if collisionType == "PHurtToEHurt":
                     #player priortize
                 self.getEntity().handleCollision(collisionType, OffendingBox)
+    
+    def disableHurtBox(self):
+        gameLogicFunctions.removeBoxFromGroup(self.type, self)
+
+    def enableHurtBox(self):
+        gameLogicFunctions.addBoxToGroup(self.type, self)
+
+class groundCheckBox(pygame.sprite.Sprite):
+
+    def __init__(self, parentEntity, rect) -> None:
+        super().__init__()
+
+        self.parent = parentEntity
+        self.rect = rect
+        
+
+    def getEntity(self):
+        return self.parent
+
+    def update(self):
+       
+
+        parentPosX = self.parent.posX
+        parentPosY = self.parent.posY
+
+    
+        newX = parentPosX - (self.rect.width//2)
+        newY = parentPosY 
+        self.rect = pygame.Rect(newX, newY, self.rect.width, self.rect.height)
 
 
-
-
-
-    def __del__ (self):
-        pass
 
 
 
@@ -129,8 +153,6 @@ class collisionBox(pygame.sprite.Sprite):
 
 
 
-    def __del__ (self):
-        pass
 
 
 

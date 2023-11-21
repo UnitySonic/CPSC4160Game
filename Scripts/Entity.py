@@ -197,6 +197,18 @@ class Entity:
             self.HP - Box.damage
 
 
+    def moveEntity(self, unitsX, unitsY):
+        self.posX += unitsX
+        self.posY += unitsY
+        self.hurtbox.update()
+        self.groundCheckBox.update()
+    
+    def moveEntityPosition(self, posX, posY):
+        self.posX = posX
+        self.posY = posY
+        self.hurtbox.update()
+        self.groundCheckBox.update()
+    
 
 
     def update(self):
@@ -209,18 +221,14 @@ class Entity:
 
 
     def isGrounded(self):
-        collide = pygame.sprite.spritecollide(self.hurtbox, gameLogicFunctions.collisionGroup, False)
+        collide = pygame.sprite.spritecollide(self.groundCheckBox, gameLogicFunctions.collisionGroup, False)
         if collide:
+            
             return True
         else:
             return False
 
-    def isGrounded(self):
-        collide = pygame.sprite.spritecollide(self.hurtbox, gameLogicFunctions.collisionGroup, False)
-        if collide:
-            return True
-        else:
-            return False
+   
 
 
 

@@ -8,6 +8,8 @@ from Scripts.Logic import Attack
 
 
 
+
+
 class meleeAttack1(Attack.Attack):
     def __init__(self, parentEntity):
 
@@ -30,11 +32,36 @@ class meleeAttack1(Attack.Attack):
             attackStartX = self.parent.posX + 60
         else:
             attackStartX = self.parent.posX - 60 - self.attackWidth
+        
+        self.attackStartX = attackStartX
+        self.attackStartY = attackStartY
+        
+        self.delay = 10
 
 
         rect1 = pygame.Rect(attackStartX, attackStartY, self.attackWidth, self.attackHeight)
-        hitbox1 = Collision.hitbox(1, self, rect1, "None",  0,  10, 3,  10, 32)
+        hitbox1 = Collision.hitbox(1, self, rect1, "None",  0,  10, 3,  self.delay, 32)
         self.hitboxes[1] = hitbox1
+    
+    def update(self):
+        if len(self.hitboxes) > 0:
+            for hitbox in self.hitboxes.values():
+                self.recalculateHitbox(hitbox)
+                hitbox.update()
+                self.delay -= 1
+                
+                if self.delay == 0:
+                    self.createFireBall()
+            self.cleanUp()
+        else:
+            self.parent.attackEnded()
+    
+    def createFireBall(self):
+        if self.directionFaced == 1:
+            positionX = self.attackStartX + self.attackWidth
+        else:
+            positionX = self.attackStartX
+        newBall = Fireball("fireball2", None, None, (positionX, self.attackStartY+ self.attackHeight//2) , None)
 
 
 
@@ -52,16 +79,16 @@ class meleeAttack2(Attack.Attack):
         self.attackHeight = 200
         self.attackType = "EHitBox"
 
-        attackStartY = self.parent.posY - 220
+        attackStartY = self.parent.posY - self.attackHeight
         attackStartX = 0
 
 
         self.directionFaced = self.parent.direction
 
         if self.directionFaced == 1:
-            attackStartX = self.parent.posX + 60
+            attackStartX = self.parent.posX
         else:
-            attackStartX = self.parent.posX - 100 - self.attackWidth
+            attackStartX = self.parent.posX - self.attackWidth
 
 
         rect1 = pygame.Rect(attackStartX, attackStartY, self.attackWidth, self.attackHeight)
@@ -81,37 +108,50 @@ class meleeAttack2(Attack.Attack):
             self.parent.attackEnded()
 
 
-
+##Time to rewrite this a bit lol(I think it's time for a boss attack json :skull:)
 class Fireball(Attack.Attack):
-    def __init__(self, rise, run, split, parentEntity = None, position = None, attackWidth = None, attackHeight = None):
+    def __init__(self, fireBallID  ,fireBallData,  parentEntity , position, direction ):
+
 
         super().__init__(parentEntity)
-
-
-
         self.attackType = "EHitBox"
-        self.split = split
+        self.fireBallID = fireBallID
 
-        self.rise = rise
-        self.run = run
+
+        if fireBallData == None:
+            self.fireBallData = gameLogicFunctions.boss1Data["attackData"][fireBallID]
+        else:
+            self.fireBallData = fireBallData
+        
+        self.direction = direction
+
+
+        self.rise = self.fireBallData["rise"]
+        self.run = self.fireBallData["run"]
+        if self.fireBallID == "fireball1":
+                self.run = abs(self.run) * self.direction
+
+        self.attackWidth = self.fireBallData["attackWidth"]
+        self.attackHeight = self.fireBallData["attackHeight"]
+
+
         self.framesTillSplit = 0
         self.timer = 20
 
-        if self.split == True:
-            self.framesTillSplit = 60
+        if self.fireBallData["children"] is not None :
+            self.framesTillSplit = self.fireBallData["framesTillSplit"]
 
+        
+        
+        
         if parentEntity != None:
 
             self.parent = parentEntity
-
-
-            self.attackWidth = 50
-            self.attackHeight = 50
-
             self.autoMode = False
 
             attackStartY = self.parent.posY - 40
             attackStartX = self.parent.posX
+
 
             if self.run <= 0:
                 attackStartX = self.parent.posX + 60
@@ -119,15 +159,13 @@ class Fireball(Attack.Attack):
                 attackStartX = self.parent.posX - 60 - self.attackWidth
 
         else:
-            self.attackWidth = attackWidth
-            self.attackHeight = attackHeight
             self.position = position
             attackStartX = position[0]
             attackStartY = position[1]
             self.autoMode = True
         
 
-        if self.split:
+        if self.fireBallData["children"] is not None:
             priority = 3
         else:
             priority = 0
@@ -154,14 +192,9 @@ class Fireball(Attack.Attack):
             self.parent.attackEnded()
             self.autoMode = True
 
-        if self.split == True and self.framesTillSplit <= 0:
-
-
-            Fireball1 = Fireball(8, self.run, False,None, (self.hitboxes[0].rect.x, self.hitboxes[0].rect.y), self.attackWidth/2, self.attackHeight/2)
-            Fireball2 = Fireball(0, self.run, False,None, (self.hitboxes[0].rect.x, self.hitboxes[0].rect.y), self.attackWidth/2, self.attackHeight/2)
-            Fireball3 = Fireball(-8, self.run, False,None, (self.hitboxes[0].rect.x, self.hitboxes[0].rect.y), self.attackWidth/2, self.attackHeight/2)
-
-
+        if self.fireBallData["children"] is not None and self.framesTillSplit <= 0:
+            for child in self.fireBallData["children"].keys():
+                    newFireball = Fireball(self.fireBallID, self.fireBallData["children"][child], None, (self.hitboxes[0].rect.x, self.hitboxes[0].rect.y), self.direction) 
 
             self.hitboxes[0].forceKillHitBox()
             gameLogicFunctions.removeEntity(self)

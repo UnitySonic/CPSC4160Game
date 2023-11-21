@@ -15,7 +15,7 @@ class meleeAttack1(Attack.Attack):
         self.attackType = "PHitBox"
 
 
-        hitbox1 = Collision.hitbox(1, self, pygame.Rect(0,0,self.attackWidth, self.attackHeight), "None",  0,  10, 1,  8, 9)
+        hitbox1 = Collision.hitbox(1, self, pygame.Rect(0,0,self.attackWidth, self.attackHeight), "None",  0,  10, 1,  9, 9)
         self.hitboxes[1] = hitbox1
 
         self.horiOffset = 20
@@ -38,7 +38,7 @@ class meleeAttack2(Attack.Attack):
         self.attackType = "PHitBox"
 
 
-        hitbox1 = Collision.hitbox(1, self, pygame.Rect(0,0,self.attackWidth, self.attackHeight), "None",  0,  10, 2,  8, 9)
+        hitbox1 = Collision.hitbox(1, self, pygame.Rect(0,0,self.attackWidth, self.attackHeight), "None",  0,  10, 2,  9, 9)
         self.hitboxes[1] = hitbox1
         self.horiOffset = 20
         self.vertOffset = 80
