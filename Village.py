@@ -1,6 +1,7 @@
 import pygame
 import os
 import time
+import sys
 from Scripts.Player.Player import Player
 from npc import NPC
 from Scripts.Logic import gameLogicFunctions
@@ -94,6 +95,8 @@ dialogue_texts = [
     "I have tracked the Fallen Archmage, Crimson, to these surrounding lands.",
     "It's believed that he has made a contract with a strong demon to increase his deadly fire magic.",
     "I request your assistance hunting him down before he harms any nearby villages.",
+    "He has already sent his goblin army to scout ahead",
+    "Use them to practice your skills before entering his lair",
     "I will keep watch around here in case he tries to escape!",
     "Be careful and remember your training!"
 ]
@@ -128,20 +131,6 @@ while run:
     screen.blit(background_image, (0, 0))
     screen.blit(ground_image, (0, SCREEN_HEIGHT - ground_height))
     screen.blit(main_character.image, main_character.rect)
-
-    # Check if the player crosses the position to transition to a new file
-    if main_character.rect.right > 1100:
-
-
-        gameLogicFunctions.clearGroups()
-        # Transition to the new file (testvill.py)
-        import mainScript
-
-        # closes the current game window
-        pygame.quit()
-
-        # quits the current script
-        raise SystemExit
 
     # Draw title and start message in the middle of the screen
     title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3 - 50))
@@ -194,4 +183,17 @@ while run:
     
 
 
+    # Check if the player crosses the position to transition to a new file
+    if main_character.rect.right > 1100:
+        gameLogicFunctions.clearGroups()
+        # Transition to the new level (training.py)
+        import training
+        #training.run_training_level()
+        pygame.quit()
+
+        sys.exit()
+
+
+# Close the current game window and script
 pygame.quit()
+raise SystemExit
