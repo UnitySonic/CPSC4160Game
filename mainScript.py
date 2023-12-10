@@ -8,6 +8,8 @@ from Scripts.BossScripts.Boss1 import boss1
 from Scripts.BossScripts.Boss2 import boss2
 from Scripts.Logic import Collision
 
+import subprocess
+
 
 gameOver = False
 stageOver = False
@@ -77,6 +79,9 @@ def collisionDetection():
 pygame.init()
 while gameOver != True:
 
+    deathCounter = 0
+    stageOver = False
+
 
     pygame.display.set_caption("The Spell Blade - Milestone 2")
 
@@ -117,11 +122,10 @@ while gameOver != True:
 
 
         player = Player.Player((300,600))
-        boss = boss1.boss_Crimson((400, 400), player)
-        #boss2 = boss2.boss_Demon((200,200), player)
+        boss = boss1.boss_Crimson((800, 600), player)
         gameLogicFunctions.addEntity(player)
         gameLogicFunctions.addEntity(boss)
-        #gameLogicFunctions.addEntity(boss2)
+       
 
         while stageOver != True:
             for event in pygame.event.get():
@@ -173,11 +177,37 @@ while gameOver != True:
             if drawCollision:
                 drawCollisionBoxes()
             pygame.display.flip()
+            
 
-            #gameLogicFunctions.clearGroups()
+            if player.HP <= 0:
+                deathCounter+= 1
+                if deathCounter > 200:
+                    command = [sys.executable, "mainScript.py"]
+
+                    # Launch a new process to run the script
+                    subprocess.Popen(command)
+                    sys.exit()
+                    
+                
+            elif boss.HP <= 0:
+                #Display Text
+                hint = font.render("Continue right to next level!", True, (255, 255, 255)) 
+                hint_rect = hint.get_rect()
+                hint_rect.center = (screen_width //2, screen_height//3)
+
+                screen.blit(hint,hint_rect)
+
+                if player.state != "victory" and player.posX > 1100:
+                    gameLogicFunctions.clearGroups()
+                    import Village2
+                    pygame.quit()  
+                    raise SystemExit  
+            
+            pygame.display.flip()
+          
             clock.tick(50)
             fps = clock.get_fps()
-            #print(f"FPS: {fps:.2f}")
+           
 
 
 

@@ -18,7 +18,8 @@
         "magic3Sheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Spin Attack/Battlemage Spin Attack.png",
         "deathSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Death/Battlemage Death.png",
         "hitBackSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Hurt 1 n 2/Hurt 1.png",
-        "hitForwardSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Hurt 1 n 2/Hurt 2.png"
+        "hitForwardSheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Hurt 1 n 2/Hurt 2.png",
+        "victorySheet" : "Assets/Player/Battlemage Complete (Sprite Sheet)/Idle/Victory.png"
     },
 
     "spriteSheetClips": {
@@ -32,6 +33,9 @@
                              "6": [19,305,17,31, 28, 335],
                              "7": [18,355,18,29, 28, 383]
                             },
+        "victoryClips": {  "0": [20, 19, 17, 29, 28, 47 ]
+
+        },
 
         "runClips" :    {"0": [19,19,17,29, 28, 47],
                              "1": [18,66,18,30, 28, 95],
@@ -165,6 +169,15 @@
             "repeatFramesBound" : [0, 7],
             "framesPerSprite" : 3,
             "clips" : "idle"
+        },
+        "victory":
+        {
+            "transition": true,
+            "repeat": false,
+            "totalFramesBound": [0,0],
+            "repeatFramesBound": null,
+            "framesPerSprite": 200,
+            "clips": "victory"
         },
 
         "run": {

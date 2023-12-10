@@ -46,7 +46,7 @@ class meleeAttack1(Attack.Attack):
     def update(self):
         if len(self.hitboxes) > 0:
             for hitbox in self.hitboxes.values():
-                self.recalculateHitbox(hitbox)
+                
                 hitbox.update()
                 self.delay -= 1
                 
@@ -175,6 +175,7 @@ class Fireball(Attack.Attack):
         self.hitboxes[0] = hitbox1
 
         gameLogicFunctions.addEntity(self)
+        
 
 
 
@@ -194,7 +195,10 @@ class Fireball(Attack.Attack):
 
         if self.fireBallData["children"] is not None and self.framesTillSplit <= 0:
             for child in self.fireBallData["children"].keys():
-                    newFireball = Fireball(self.fireBallID, self.fireBallData["children"][child], None, (self.hitboxes[0].rect.x, self.hitboxes[0].rect.y), self.direction) 
+                    newFireball = Fireball(self.fireBallID, self.fireBallData["children"][child], None, (self.hitboxes[0].rect.x, self.hitboxes[0].rect.y), self.direction)
+                    splitSound = pygame.mixer.Sound("Assets/Sounds/e_fireballsplit.wav")
+                    splitSound.set_volume(0.25)
+                    splitSound.play()
 
             self.hitboxes[0].forceKillHitBox()
             gameLogicFunctions.removeEntity(self)

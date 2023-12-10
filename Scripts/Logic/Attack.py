@@ -12,6 +12,9 @@ class  Attack():
         self.cleanUpQueue = []
         self.horiOffset = 0
         self.vertOffset = 0
+        self.sound = None
+        
+        self.soundPlayed = False
 
     def getAttackType(self):
         return self.attackType
@@ -36,7 +39,7 @@ class  Attack():
     def update(self):
         if len(self.hitboxes) > 0:
             for hitbox in self.hitboxes.values():
-                self.recalculateHitbox(hitbox)
+                self.recalculateHitbox(hitbox)  
                 hitbox.update()
             self.cleanUp()
         else:

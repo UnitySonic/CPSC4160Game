@@ -38,6 +38,8 @@ class Player(Entity.Entity):
         self.deathSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["deathSheet"])
         self.hitBackSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["hitBackSheet"])
         self.hitForwardSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["hitForwardSheet"])
+        self.hitForwardSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["hitForwardSheet"])
+        self.victorySheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["victorySheet"])
 
 
         self.rect = pygame.Rect(self.posX, self.posY, 20, 32)
@@ -113,6 +115,7 @@ class Player(Entity.Entity):
         self.hitBackClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["hitBackClips"].items()}
         self.hitForwardClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["hitForwardClips"].items()}
         self.deathClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["deathClips"].items()}
+        self.victoryClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["victoryClips"].items()}
 
 
         self.stateToSpriteDict =  {"idle": self.idleClips,
@@ -129,6 +132,7 @@ class Player(Entity.Entity):
                                    "death" : self.deathClips,
                                    "hitBack" : self.hitBackClips,
                                    "hitForward": self.hitForwardClips,
+                                   "victory" : self.victoryClips
                                   }
         self.stateToSheetDict =   {"idle": self.idleSheet,
                                    "run": self.runSheet,
@@ -143,7 +147,8 @@ class Player(Entity.Entity):
                                    "airAtk" : self.airAttackSheet,
                                    "hitBack": self.hitBackSheet,
                                    "hitForward": self.hitForwardSheet,
-                                   "death" : self.deathSheet
+                                   "death" : self.deathSheet,
+                                   "victory" : self.victorySheet
                                   }
         self.stateToFunctionDict = {"idle": self.idleState,
                                     "run": self.runState,
@@ -152,7 +157,9 @@ class Player(Entity.Entity):
                                     "groundatk" : self.groundAttackState,
                                     "crouch" : self.crouchState,
                                     "death" : self.deathState,
-                                    "hurt" : self.hurtState
+                                    "hurt" : self.hurtState,
+                                    "victory" : self.victoryState
+
                                    }
 
 
@@ -169,6 +176,14 @@ class Player(Entity.Entity):
 
 
 
+    def set_state(self, new_state):
+
+        if new_state == "air":
+            pygame.mixer.Sound('Assets/Sounds/p_jump.wav')
+
+        self.state = new_state
+        self.elapsedFramesInState = 0
+
 
 
     def handleCollision(self, CollisionType, Box):
@@ -181,6 +196,8 @@ class Player(Entity.Entity):
                     self.set_state("death")
                 else:
                     self.set_state("hurt")
+                    sound = pygame.mixer.Sound("Assets/Sounds/p_hurt.wav")
+                    sound.play()
                     
                 
                 if self.refToCurrentAttack is not None:
@@ -264,9 +281,7 @@ class Player(Entity.Entity):
 
         self.stateToFunctionDict[self.state]()
 
-        if self.isGrounded() == False:
-            print("Not grounded")
-            #self.continueGravity()
+        
         self.updateSprite()
         self.hurtbox.update()
         self.groundCheckBox.update()
@@ -375,6 +390,7 @@ class Player(Entity.Entity):
         if self.dashPressed:
             self.set_state("dash")
             self.set_animation("dash", True)
+            pygame.mixer.Sound('Assets/Sounds/p_dash.wav').play()
         
         elif self.attackPressed:
             self.set_state("groundatk")
@@ -418,6 +434,7 @@ class Player(Entity.Entity):
         if self.dashPressed:
             self.set_state("dash")
             self.set_animation("dash", True)
+            pygame.mixer.Sound('Assets/Sounds/p_dash.wav').play()
             
         elif self.jumpPressed:
             self.isJumping = True
@@ -522,24 +539,65 @@ class Player(Entity.Entity):
         
     
     def hurtState(self):
+        
+            
         hurtStateTime = 20
 
         
         self.invinFrames = 40     
         if self.elapsedFramesInState > hurtStateTime:
-            self.set_state("idle")
-            self.set_animation("idle", True)
+
+            if self.isGrounded():
+                self.set_state("idle")
+                self.set_animation("idle", True)
+            else:
+                self.set_state("air")
             self.priorityLastHitBy = -1
         
         if self.animation == "hitBack":
             self.posX -= 2 * self.direction
         else:
             self.posX += 2 * self.direction
+        
+
+        if self.isGrounded():
+            pass
+        else:
+            if self.yVelocity > 0:
+                self.yVelocity = 0 
+            self.posY -= self.yVelocity
+            self.yVelocity -= self.yGravity
+
 
 
     
     def deathState(self):
-        self.set_animation("death")   
+        self.set_animation("death")  
+        self.hurtbox.disableHurtBox()
+        if self.isGrounded():
+            pass
+        else:
+            if self.yVelocity > 0:
+                self.yVelocity = 0 
+            self.posY -= self.yVelocity
+            self.yVelocity -= self.yGravity 
+    
+
+    def victoryState(self):
+        self.hurtbox.disableHurtBox()
+        poseTime = 150 
+        if self.isGrounded():
+            self.set_animation("victory")
+
+            if(self.elapsedFramesInState > poseTime):
+                self.resetAllAnimation()
+                self.hurtbox.enableHurtBox()
+                self.set_state("idle")
+        else:
+            if self.yVelocity > 0:
+                self.yVelocity = 0 
+            self.posY -= self.yVelocity
+            self.yVelocity -= self.yGravity 
 
      
             

@@ -43,7 +43,7 @@ class boss_Crimson(Entity.Entity):
         self.animation = "idle"
 
 
-        self.direction = 1
+        self.direction = -1
         self.canJump = True
         self.yVelocity = 1
         self.xVelocity = 0
@@ -122,6 +122,10 @@ class boss_Crimson(Entity.Entity):
             }
         self.currentFrameWidth = 0
         self.currentFrameHeight = 0
+        self.sentDeathSignal = False
+        self.invinFrames = 0
+
+        self.hurtbox.update()
 
 
 
@@ -166,6 +170,10 @@ class boss_Crimson(Entity.Entity):
 
             self.commitToAttack = True
             self.refToCurrentAttack = boss1Attacks.meleeAttack1(self)
+            meleeSound = pygame.mixer.Sound("Assets/Sounds/e_melee.wav")
+            meleeSound.set_volume(0.5)
+            meleeSound.play()
+
             self.set_animation("atk1")
             self.xVelocity = 0
         else:
@@ -187,6 +195,13 @@ class boss_Crimson(Entity.Entity):
                 self.direction = -1
 
             self.refToCurrentAttack = boss1Attacks.meleeAttack2(self)
+            meleeSound = pygame.mixer.Sound("Assets/Sounds/e_melee.wav")
+            meleeSound.set_volume(0.5)
+            meleeSound.play()
+            fireBallSound = pygame.mixer.Sound("Assets/Sounds/e_fireball2.wav")
+            fireBallSound.play()
+
+
             self.set_animation("atk2")
         else:
             self.refToCurrentAttack.update()
@@ -198,13 +213,14 @@ class boss_Crimson(Entity.Entity):
         VANISHTIMER = 120
         self.set_animation("teleport")
         self.hurtbox.disableHurtBox()
+       
 
         if self.elapsedFramesInState > VANISHTIMER:
             self.hurtbox.enableHurtBox()
             self.direction *= -1
 
 
-            self.moveEntityPosition(self.playerRef.posX - 150 * self.direction, self.posY)
+            self.moveEntityPosition(self.playerRef.posX - 180 * self.direction, self.posY)
 
             choice = random.randint(0,2)
 
@@ -227,7 +243,16 @@ class boss_Crimson(Entity.Entity):
     def fireballState(self):
 
         if(self.commitToAttack == False):
+
+            distance = self.rect.centerx - self.playerRef.rect.centerx
+            if (distance < 0):
+                self.direction = 1
+            if(distance >= 0):
+                self.direction = -1
+
+
             self.refToCurrentAttack = boss1Attacks.Fireball("fireball1", None, self, None, self.direction)
+            pygame.mixer.Sound("Assets/Sounds/e_fireball1.wav").play()
             self.set_animation("fireball", True)
             self.commitToAttack = True
         else:
@@ -273,7 +298,7 @@ class boss_Crimson(Entity.Entity):
 
 
     def idleState(self):
-        IDLESTATETIME = 120
+        IDLESTATETIME = 60
         self.set_animation("idle")
         
        
@@ -281,8 +306,9 @@ class boss_Crimson(Entity.Entity):
         if self.elapsedFramesInState >= IDLESTATETIME:
 
             choice = random.randint(0,4)
+           
             
-        
+            
            
             if choice == 0:
                 self.set_state("runAround")
@@ -296,11 +322,14 @@ class boss_Crimson(Entity.Entity):
             elif choice == 4:
                 self.set_state("teleport")
                 self.set_animation("teleport", True)
+                sound = pygame.mixer.Sound("Assets/Sounds/e_teleport.wav")
+                sound.set_volume(0.35)
+                sound.play()
             
 
 
     def hurtState(self):
-        hurtStateTime = 100
+        hurtStateTime = 40
 
         self.xVelocity = 0
 
@@ -308,11 +337,16 @@ class boss_Crimson(Entity.Entity):
             self.set_state("idle")
             self.set_animation("idle", True)
             self.priorityLastHitBy = -1
+            self.invinFrames = 60
     
     
     
     def deathState(self):
+        self.hurtbox.disableHurtBox()
         self.xVelocity = 0
+        if self.sentDeathSignal == False:
+            self.playerRef.set_state("victory")
+            self.sentDeathSignal = True
 
        
 
@@ -322,11 +356,14 @@ class boss_Crimson(Entity.Entity):
     def handleCollision(self, CollisionType, Box):
 
         if CollisionType  == "PHitToEHurt":
-            if self.refToCurrentAttack == None and self.state is not "hit":
+            
+            if self.refToCurrentAttack == None and self.state != "hit" and self.state != "death":
                 self.set_state("hit")
                 self.set_animation("hit", True)
 
             if Box.priority > self.priorityLastHitBy:
+                sound = pygame.mixer.Sound("Assets/Sounds/p_saberhit.wav")
+                sound.play()
                 self.HP = self.HP - Box.damage
                 self.priorityLastHitBy = Box.priority
                 if self.HP <= 0:
@@ -344,9 +381,7 @@ class boss_Crimson(Entity.Entity):
     def update(self):
         self.updateSprite()
 
-        if self.isGrounded() == False and self.yVelocity>0:
-            self.set_state("jump")
-            self.jumpState(True)
+        
 
         self.stateToFunctionDict[self.state]()
 

@@ -223,7 +223,7 @@ class Entity:
     def isGrounded(self):
         collide = pygame.sprite.spritecollide(self.groundCheckBox, gameLogicFunctions.collisionGroup, False)
         if collide:
-            
+            self.posY = collide[0].rect.y
             return True
         else:
             return False

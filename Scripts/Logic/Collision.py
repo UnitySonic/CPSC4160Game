@@ -31,11 +31,14 @@ class hitbox(pygame.sprite.Sprite):
         if self.delay > 0:
             if self.delay == 1:
                 gameLogicFunctions.addBoxToGroup(self.attackRef.getAttackType(), self)
+                
             self.delay -= 1
         elif self.remainingFrames > 0:
             self.remainingFrames -= 1
+            
         else:
            self.signalToKillHitBox()
+           
 
     def signalToKillHitBox(self):
         self.attackRef.signal(self.ID)
