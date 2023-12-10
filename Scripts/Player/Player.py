@@ -18,9 +18,6 @@ class Player(Entity.Entity):
         with open(directory, "r") as file:
             self.jsonData = json.load(file)
 
-
-
-
         self.idleSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["idleSheet"])
         self.runSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["runSheet"])
         self.jumpNeutralSheet = pygame.image.load(self.jsonData["spriteSheetDirectory"]["jumpNeutralSheet"])
@@ -46,7 +43,7 @@ class Player(Entity.Entity):
         #In adobe, I used a bounding box of width 10 to help set pivot points for Cyline
         self.hurtbox = Collision.hurtBox(self, "PHurtBox", pygame.Rect(self.posX, self.posY, 40, 70), 0)
         self.groundCheckBox = Collision.groundCheckBox(self,pygame.Rect(self.posX, self.posY, 20, 1))
-        self.HP = 100
+        self.HP = 8
 
 
         self.refToCurrentAttack = None
@@ -95,6 +92,7 @@ class Player(Entity.Entity):
 
         
 
+        self.hpClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["idleClips"].items()}
 
         #states
         self.idleClips = {int(key): value for key, value in self.jsonData["spriteSheetClips"]["idleClips"].items()}
@@ -176,7 +174,7 @@ class Player(Entity.Entity):
             if self.invinFrames <= 0:
                 self.invinFrames = 40
                 
-                self.HP -= Box.damage
+                self.HP -= 1
                 if self.HP <= 0:
                     self.set_state("death")
                 else:
@@ -316,7 +314,6 @@ class Player(Entity.Entity):
             self.yVelocity -= self.yGravity
 
             if self.isGrounded():
-                print("grounded")
                 self.set_animation(self.refToAirborneSet[2], True)
                 return False
         return True

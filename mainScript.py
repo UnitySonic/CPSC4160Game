@@ -2,6 +2,8 @@ import pygame
 import sys
 import os
 import time
+import json
+import hp
 from Scripts.Logic import gameLogicFunctions
 from Scripts.Player import Player
 from Scripts.BossScripts.Boss1 import boss1
@@ -78,7 +80,7 @@ pygame.init()
 while gameOver != True:
 
 
-    pygame.display.set_caption("The Spell Blade - Milestone 2")
+    pygame.display.set_caption("The Spell Blade - Milestone 3")
 
     #set up refresh rate
     clock = pygame.time.Clock()
@@ -87,7 +89,6 @@ while gameOver != True:
     #Stage Select
 
     font = pygame.font.Font(None, 36)
-
 
     textBossHP = font.render("Hello, Pygame!", True, (255, 255, 255)) 
     textBossHP_rect = textBossHP.get_rect()
@@ -118,6 +119,7 @@ while gameOver != True:
 
         player = Player.Player((300,600))
         boss = boss1.boss_Crimson((400, 400), player)
+        playerHP = hp.HP((50,50))
         #boss2 = boss2.boss_Demon((200,200), player)
         gameLogicFunctions.addEntity(player)
         gameLogicFunctions.addEntity(boss)
@@ -146,13 +148,13 @@ while gameOver != True:
                 screen.blit(background, (0, 0))
             ground = pygame.draw.rect(screen, (128,128,128), groundDimensions)
 
+            currentPlayerHP = player.HP
 
             collisionDetection()
-            textBossHP = font.render(f"BOSS HP: {boss.HP}", True, (255, 255, 255))  # True enables anti-aliasing, (255, 255, 255) is white
-            textPlayerHP = font.render(f"PLAYER HP: {player.HP}", True, (255, 255, 255))  # True enables anti-aliasing, (255, 255, 255) is white
+            if(currentPlayerHP > player.HP and currentPlayerHP > 0):
+                playerHP.take_damage(screen)
 
-            screen.blit(textPlayerHP, textPlayerHP_rect)
-            screen.blit(textBossHP,textBossHP_rect)
+            screen.blit(playerHP.image, (0, 0))
 
             for entity in gameLogicFunctions.entityList:
                 entity.update()
