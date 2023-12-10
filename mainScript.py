@@ -2,6 +2,7 @@ import pygame
 import sys
 import os
 import time
+import hp
 from Scripts.Logic import gameLogicFunctions
 from Scripts.Player import Player
 from Scripts.BossScripts.Boss1 import boss1
@@ -93,15 +94,6 @@ while gameOver != True:
 
     font = pygame.font.Font(None, 36)
 
-
-    textBossHP = font.render("Hello, Pygame!", True, (255, 255, 255)) 
-    textBossHP_rect = textBossHP.get_rect()
-    textBossHP_rect.center = (screen_width - 100, 30)
-
-    textPlayerHP = font.render("Hello, Pygame!", True, (255, 255, 255)) 
-    textPlayerHP_rect = textPlayerHP.get_rect()
-    textPlayerHP_rect.center = (100, 30)
-
     if stageSelect == "Boss1":
         drawCollision = False
         bgScaleFactorX = 0.75
@@ -123,6 +115,7 @@ while gameOver != True:
 
         player = Player.Player((300,600))
         boss = boss1.boss_Crimson((800, 600), player)
+        playerHP = hp.HP((50,50))
         gameLogicFunctions.addEntity(player)
         gameLogicFunctions.addEntity(boss)
        
@@ -151,12 +144,12 @@ while gameOver != True:
             ground = pygame.draw.rect(screen, (128,128,128), groundDimensions)
 
 
+            currentPlayerHP = player.HP
             collisionDetection()
-            textBossHP = font.render(f"BOSS HP: {boss.HP}", True, (255, 255, 255))  # True enables anti-aliasing, (255, 255, 255) is white
-            textPlayerHP = font.render(f"PLAYER HP: {player.HP}", True, (255, 255, 255))  # True enables anti-aliasing, (255, 255, 255) is white
+            if(currentPlayerHP > player.HP and currentPlayerHP > 0):
+                playerHP.take_damage(screen)
 
-            screen.blit(textPlayerHP, textPlayerHP_rect)
-            screen.blit(textBossHP,textBossHP_rect)
+            screen.blit(playerHP.image, (0, 0))
 
             for entity in gameLogicFunctions.entityList:
                 entity.update()
