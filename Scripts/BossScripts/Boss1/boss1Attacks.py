@@ -40,7 +40,7 @@ class meleeAttack1(Attack.Attack):
 
 
         rect1 = pygame.Rect(attackStartX, attackStartY, self.attackWidth, self.attackHeight)
-        hitbox1 = Collision.hitbox(1, self, rect1, "None",  0,  10, 3,  self.delay, 32)
+        hitbox1 = Collision.hitbox(1, self, rect1, "None",  0,  20, 3,  self.delay, 32)
         self.hitboxes[1] = hitbox1
     
     def update(self):
@@ -61,7 +61,7 @@ class meleeAttack1(Attack.Attack):
             positionX = self.attackStartX + self.attackWidth
         else:
             positionX = self.attackStartX
-        newBall = Fireball("fireball2", None, None, (positionX, self.attackStartY+ self.attackHeight//2) , None)
+        newBall = Fireball("fireball2", None, None, (positionX, self.attackStartY+ self.attackHeight//3) , None)
 
 
 
@@ -75,7 +75,7 @@ class meleeAttack2(Attack.Attack):
 
         
 
-        self.attackWidth = 200
+        self.attackWidth = 180
         self.attackHeight = 200
         self.attackType = "EHitBox"
 
@@ -92,7 +92,7 @@ class meleeAttack2(Attack.Attack):
 
 
         rect1 = pygame.Rect(attackStartX, attackStartY, self.attackWidth, self.attackHeight)
-        hitbox1 = Collision.hitbox(1, self, rect1, "None",  0,  10, 3,  11, 32)
+        hitbox1 = Collision.hitbox(1, self, rect1, "None",  0,  20, 3,  11, 27)
         self.hitboxes[1] = hitbox1
 
 
