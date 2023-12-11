@@ -8,7 +8,7 @@ from Scripts.Player import Player
 from Scripts.BossScripts.Boss1 import boss1
 from Scripts.BossScripts.Boss2 import boss2
 from Scripts.Logic import Collision
-
+import hp
 import subprocess
 
 
@@ -151,6 +151,26 @@ while gameOver != True:
 
             screen.blit(playerHP.image, (0, 0))
 
+            
+            # Display controls on the top right of the screen
+            controls_font = pygame.font.Font(None, 24)
+            controls_text = [
+                "CONTROLS",
+                "Left/Right Arrow: Move Left/Right",
+                "Down Arrow: Crouch",
+                "Z: Jump",
+                "X: Saber",
+                "C: Dash",
+                "T: Advance Text",
+                "Protective spell off*"
+            ]
+
+            for i, line in enumerate(controls_text):
+                controls_surface = controls_font.render(line, True, (255, 255, 255))
+                controls_rect = controls_surface.get_rect(topright=(screen_width - 10, 10 + i * 20))
+                screen.blit(controls_surface, controls_rect)
+
+
             for entity in gameLogicFunctions.entityList:
                 entity.update()
                 if hasattr(entity, "image"):
@@ -164,7 +184,8 @@ while gameOver != True:
                     else:
                         pygame.draw.rect(screen, (255,255,255), entity.hurtbox.rect)
 
-
+                        # Draw the boss's health bar
+                        screen.blit(entity.health_bar.image, entity.health_bar.rect)
 
 
             if drawCollision:

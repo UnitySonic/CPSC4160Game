@@ -4,7 +4,7 @@ import os
 from Scripts.Logic import gameLogicFunctions
 from Scripts.Player.Player import Player
 from Scripts.Logic import Collision
-
+import hp
 
 
 pygame.init()
@@ -13,9 +13,6 @@ SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Training Level")
-
-# Character initialization with starting position and correct image paths
-main_character = Player((200, 650))
 
 enemies = []
 
@@ -39,6 +36,8 @@ ground_image = pygame.transform.scale(ground_image, (SCREEN_WIDTH, SCREEN_HEIGHT
 
 # Character initialization with starting position and correct image paths
 main_character = Player((200, 650))
+# calls player hp class
+player_hp = hp.HP((0,0))
 
 # Define the new width and height for the player
 new_width = 200
@@ -51,14 +50,47 @@ main_character.image = pygame.transform.scale(main_character.image, (new_width, 
 main_character.rect = main_character.image.get_rect()
 main_character.rect.topleft = (400, 350)
 
+# Define hitboxes for player and goblin
+player_hitbox = Collision.collisionBox(main_character.rect, 0)
+def player_collision_detection():
+    global spawn_wave
+    for enemy in enemies:
+        if main_character.rect.colliderect(enemy.rect):
+            # Collision detected between player and enemy (overlap)
+            enemy.Gob_take_damage(20)  # Handle the hit
+            if enemy.should_die and enemy.state != "DEATH":
+                enemy.play_death_animation()
+                if enemy.state == "CLEANUP" and enemy.timer >= enemy.get_duration():
+                    enemies_to_remove.append(enemy)
 
 groundDimensions = pygame.Rect(-100,600,SCREEN_WIDTH + 200, 120)
 groundCollision = Collision.collisionBox(groundDimensions, 0)
+def draw_collision_boxes():
+    for p_hitbox in gameLogicFunctions.playerHitBoxGroup:
+        box_surface = pygame.Surface(p_hitbox.rect.size, pygame.SRCALPHA)
+        box_surface.fill((0, 0, 255))
+        screen.blit(box_surface, p_hitbox.rect.topleft)
+
+    for p_hurtbox in gameLogicFunctions.playerHurtBoxGroup:
+        box_surface = pygame.Surface(p_hurtbox.rect.size, pygame.SRCALPHA)
+        box_surface.fill((0, 255, 0))
+        screen.blit(box_surface, p_hurtbox.rect.topleft)
+
+    for e_hitbox in gameLogicFunctions.enemyHitBoxGroup:
+        box_surface = pygame.Surface(e_hitbox.rect.size, pygame.SRCALPHA)
+        box_surface.fill((255, 0, 0))
+        screen.blit(box_surface, e_hitbox.rect.topleft)
+
+    for e_hurtbox in gameLogicFunctions.enemyHurtBoxGroup:
+        box_surface = pygame.Surface(e_hurtbox.rect.size, pygame.SRCALPHA)
+        box_surface.fill((0, 255, 0))
+        screen.blit(box_surface, e_hurtbox.rect.topleft)
 
 class GoblinBerserker(pygame.sprite.Sprite):
     def __init__(self, position, idle_images_left, run_images_left, attack_images_left,
                 death_images_left, idle_images_right=None, run_images_right=None,
-                attack_images_right=None, death_images_right=None, is_running=False):
+                attack_images_right=None, death_images_right=None, hurt_left_images=None,
+                hurt_right_images=None, is_running=False):
         super().__init__()
         
         # Initialize the Goblin Berserker
@@ -72,7 +104,11 @@ class GoblinBerserker(pygame.sprite.Sprite):
         self.run_images_right = run_images_right
 
         self.attack_images_right = attack_images_right
-        self.death_images_right = death_images_right  
+        self.death_images_right = death_images_right 
+
+        # New attributes for hurt images
+        self.hurt_left_images = hurt_left_images
+        self.hurt_right_images = hurt_right_images 
 
         # New flag to indicate whether the goblin should perform the death animation
         self.should_die = False
@@ -125,9 +161,12 @@ class GoblinBerserker(pygame.sprite.Sprite):
         self.timer = 0
 
         # Add max_health attribute with a default value
-        self.max_health = 100
+        self.max_health = 60
         # Set initial health to max_health
         self.health = self.max_health  
+
+        # Add a counter for collisions with the player
+        self.collision_counter = 0
 
     def set_images(self):
         # facing left
@@ -166,6 +205,8 @@ class GoblinBerserker(pygame.sprite.Sprite):
                 self.attack_update()
             elif self.state == "DEATH": 
                 self.death_update()
+            elif self.state == "HURT":  # New state for hurt
+                self.hurt_update()
 
             # Reset the frame counter
             self.frame_counter = 0
@@ -224,7 +265,10 @@ class GoblinBerserker(pygame.sprite.Sprite):
         self.images = []  
         # Reset the timer for the new state
         self.timer = 0  
-
+        # Add the goblin to the list of enemies to be removed
+        enemies_to_remove.append(self)
+        # Reset the collision counter after cleanup
+        self.collision_counter = 0
 
     def idle_update(self):
         # Update animation frames for idle state
@@ -293,14 +337,47 @@ class GoblinBerserker(pygame.sprite.Sprite):
         else:
             return 0  # Return a default value if the state is not recognized
 
-    def take_damage(self, damage):
+    def Gob_take_damage(self, damage):
         # Handle damage to the Goblin Berserker
         self.health -= damage
         if self.health <= 0:
             self.health = 0
-            # Set the flag to initiate the death animation
-            self.should_die = True  
+            self.collision_counter += 1  # Increment the collision counter
+            if self.collision_counter >= 2:
+                self.hurt_left_images = [pygame.image.load(os.path.join('Assets/mobs/goblin_berserker/goblin/Left/Png/hurt/', f"GoblinLeftHurt4.png"))]
+                self.should_die = True
+            
+        else:
+            
+            #if self.collision_counter == 5:
+             self.switch_to_hurt_state()
+              #  self.should_die = True 
+            
+    
+    def switch_to_hurt_state(self):
+        # Switch to the hurt state and set the images accordingly
+        self.state = "HURT"
+        self.images = self.hurt_left_images if self.direction == -1 else self.hurt_right_images
+        self.timer = 0  # Reset the timer for the new state
+        self.index = 0  # Reset the animation index
 
+
+    def hurt_update(self):
+        # Increment the frame counter
+        self.frame_counter += 1
+
+        # Update animation frames for hurt state
+        self.index += 1
+
+        if self.index >= len(self.images):
+            self.index = 0
+
+        self.image = self.images[self.index]
+
+        # Check if it's time to switch to the next state or cleanup
+        if self.timer >= self.get_duration():
+            self.timer = 0
+            self.state = "IDLE"  # Switch back to idle state after hurt
 
     def play_death_animation(self):
         # Switch to the death state and set the images accordingly
@@ -329,14 +406,18 @@ num_frames_run = 6
 run_left_images = [pygame.image.load(os.path.join('Assets/mobs/goblin_berserker/goblin/Left/Png/run/',  f"GoblinLeftRun{i}.png")) for i in range(1, num_frames_run + 1)]
 run_right_images = [pygame.image.load(os.path.join('Assets/mobs/goblin_berserker/goblin/Right/Png/run/',  f"GoblinRightRun{i}.png")) for i in range(1, num_frames_run + 1)]
 
-# Load sprite sheets for GoblinLeftAttack
+# Load sprite sheets for Goblin Hurt
+num_frames_hurt = 4
+
+hurt_left_images = [pygame.image.load(os.path.join('Assets/mobs/goblin_berserker/goblin/Left/Png/hurt/', f"GoblinLeftHurt{i}.png")) for i in range(1, num_frames_hurt + 1)]
+hurt_right_images = [pygame.image.load(os.path.join('Assets/mobs/goblin_berserker/goblin/Right/Png/hurt/', f"GoblinRightHurt{i}.png")) for i in range(1, num_frames_hurt + 1)]
+
+# Load sprite sheets for Goblin Attack
 num_frames_attack = 11
 
 attack_left_images = [pygame.image.load(os.path.join('Assets/mobs/goblin_berserker/goblin/Left/Png/attack/',  f"GoblinLeftAttack{i}.png")) for i in range(1, num_frames_run + 1)]
 attack_right_images = [pygame.image.load(os.path.join('Assets/mobs/goblin_berserker/goblin/Right/Png/attack/',  f"GoblinRightAttack{i}.png")) for i in range(1, num_frames_run + 1)]
 
-# Load sprite sheets for GoblinLeftHurt
-# WIP 
 
 # Load sprite sheets for Goblin Death
 num_frames_death = 9  
@@ -358,7 +439,10 @@ def spawn_enemies():
         goblin = GoblinBerserker(
             (start_x_position, y_position),
             idle_left_images, run_left_images, attack_left_images, death_left_images,
-            idle_right_images, run_right_images, attack_right_images, death_right_images
+            idle_right_images, run_right_images, attack_right_images, death_right_images,
+            is_running=False,
+            hurt_left_images=hurt_left_images,
+            hurt_right_images=hurt_right_images
         )
 
 
@@ -371,6 +455,7 @@ def spawn_enemies():
 # Main game loop
 running = True
 while running:
+    enemies_to_remove = []
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -381,9 +466,26 @@ while running:
                 # Press 'u' to kill all goblins and trigger death animations
                 for enemy in enemies:
                     enemy.should_die = True  # Set the flag for each goblin
+                    enemy.play_death_animation() # Triggers the death animation
 
         # Handle player input inside the event loop
         main_character.handle_event(event)
+
+    currentPlayerHP = player_hp
+    player_collision_detection()
+    #checks if player current health decreased 
+    if currentPlayerHP.get_health() > player_hp.get_health() and currentPlayerHP.get_health() > 0:
+        player_hp.take_damage(screen)
+
+    # Draw the background first
+    screen.blit(background_image, (0, 0))
+    screen.blit(ground_image, (0, SCREEN_HEIGHT - ground_height))
+
+    # Draw the player character
+    screen.blit(main_character.image, main_character.rect)
+
+    # Draw the player's health bar
+    screen.blit(player_hp.image, (0, 0))
 
     # Spawn enemies when the wave is requested
     spawn_enemies()
@@ -391,60 +493,63 @@ while running:
     # Update entities
     main_character.update()
 
+    # Handle collisions and remove entities
     for enemy in enemies:
+        # Handle enemy-specific logic
         enemy.update()
-
-        # Check if the goblin should perform the death animation
         if enemy.should_die and enemy.state != "DEATH":
             enemy.play_death_animation()
+            enemy.Gob_take_damage(20)
 
-    # List to store enemies to be removed
-    enemies_to_remove = [] 
+            if enemy.state == "CLEANUP" and enemy.timer >= enemy.get_duration():
+                enemies_to_remove.append(enemy)
 
-    # Check for collisions and handle health
-    for enemy in enemies:
-        if pygame.sprite.collide_rect(main_character, enemy):
-            # Handle collision logic (reduce player health, etc.) WIP
-            pass
-
-        # Check if the goblin is in the "CLEANUP" state and animation is complete
-        if enemy.state == "CLEANUP" and enemy.timer >= enemy.get_duration():
-            enemies_to_remove.append(enemy)
-
-    # Remove goblins that have completed their cleanup
+    # Remove enemies that have completed their cleanup
     for enemy in enemies_to_remove:
         enemies.remove(enemy)
 
     # Render entities and background
-    screen.blit(background_image, (0, 0))
-
-    screen.blit(ground_image, (0, SCREEN_HEIGHT - ground_height))
-
-    screen.blit(main_character.image, main_character.rect)
 
     for enemy in enemies:
         screen.blit(enemy.image, enemy.rect)
 
+        # Display goblin health above their heads
+        font = pygame.font.Font(None, 24)
+        health_text = font.render(f"Health: {enemy.health}", True, (255, 255, 255))
+        health_rect = health_text.get_rect(center=(enemy.rect.centerx, enemy.rect.y - 20))
+        screen.blit(health_text, health_rect)
+
     # Display a notification when the wave is finished
     if not enemies and spawn_wave == False:
-
         # Display a message on the screen
         font = pygame.font.Font(None, 36)
-
         message_text = font.render("Get Ready! Press 's' to spawn new enemies or move right to proceed. Press 'u' to kill all goblins.", True, (255, 255, 255))
-
         message_rect = message_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-
         screen.blit(message_text, message_rect)
+
+    # Display controls on the top right of the screen
+    controls_font = pygame.font.Font(None, 24)
+    controls_text = [
+        "CONTROLS",
+        "Left/Right Arrow: Move Left/Right",
+        "Down Arrow: Crouch",
+        "Z: Jump",
+        "X: Saber",
+        "C: Dash",
+        "T: Advance Text",
+        "Protective spell on*"
+    ]
+
+    for i, line in enumerate(controls_text):
+        controls_surface = controls_font.render(line, True, (255, 255, 255))
+        controls_rect = controls_surface.get_rect(topright=(SCREEN_WIDTH - 10, 10 + i * 20))
+        screen.blit(controls_surface, controls_rect)
 
     # Check if the player reaches the right end to move to the boss level
     if main_character.rect.right > SCREEN_WIDTH - 50:
-
         # Transition to the new file (mainScript.py for the boss level)
         import mainScript
-
         pygame.quit()
-
         sys.exit()
 
     pygame.display.flip()
