@@ -169,7 +169,20 @@ while gameOver != True:
 
             if drawCollision:
                 drawCollisionBoxes()
-            pygame.display.flip()
+            
+
+            if player.posX < 5:
+                player.moveEntityPosition(5, player.posY)
+            
+            if player.posX >  1275:
+                player.moveEntityPosition(1275, player.posY)
+            
+
+            if boss.posX < 0:
+                boss.moveEntityPosition(0, boss.posY)
+            
+            if boss.posX > 1280:
+                boss.moveEntityPosition(1280, boss.posY)
             
 
             if player.HP <= 0:

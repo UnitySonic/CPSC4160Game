@@ -149,7 +149,7 @@ class Fireball(Attack.Attack):
             self.parent = parentEntity
             self.autoMode = False
 
-            attackStartY = self.parent.posY - 40
+            attackStartY = self.parent.posY - 80
             attackStartX = self.parent.posX
 
 

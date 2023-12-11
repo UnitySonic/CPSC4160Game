@@ -44,6 +44,7 @@ class  Attack():
             self.cleanUp()
         else:
             self.parent.attackEnded()
+            
 
 
 

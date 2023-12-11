@@ -180,6 +180,11 @@ class Player(Entity.Entity):
 
         if new_state == "air":
             pygame.mixer.Sound('Assets/Sounds/p_jump.wav')
+        
+        if new_state == "crouch":
+            self.hurtbox.rect.height = 35
+        else:
+            self.hurtbox.rect.height = 70
 
         self.state = new_state
         self.elapsedFramesInState = 0
