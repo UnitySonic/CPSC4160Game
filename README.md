@@ -20,6 +20,8 @@ Cyline has a three hit Saber combo she can execute by standing on the ground and
 She can also do a saber attack while crouching and in the air.
 When Cyline is dashing and jumps she has better airspeed!
 
+Some of the smaller fireballs can be destroyed if you hit them with the saber attack
+
 Hit Priority:
 There's a system called hit priority that determines how you can combo your attacks. Every attack has it's own priority, and as long
 as the next move you use in a combo has a priority higher than the last, you'll damage the boss through it's invinciblity. The basic saber combo works because
