@@ -96,9 +96,12 @@ dialogue_texts = [
     "It's believed that he has made a contract with a strong demon to increase his deadly fire magic.",
     "I request your assistance hunting him down before he harms any nearby villages.",
     "He has already sent his goblin army to scout ahead",
+    "Since they are close to the village I can cast a protective spell on you",
+    "You won't take any damage until you face Crimson!",
     "Use them to practice your skills before entering his lair",
     "I will keep watch around here in case he tries to escape!",
     "Be careful and remember your training!"
+    
 ]
 
 run = True
@@ -181,6 +184,24 @@ while run:
     pygame.display.flip()
     clock.tick(FPS)
     
+    
+    # Display controls on the top right of the screen
+    controls_font = pygame.font.Font(None, 24)
+    controls_text = [
+        "CONTROLS",
+        "Left/Right Arrow: Move Left/Right",
+        "Down Arrow: Crouch",
+        "Z: Jump",
+        "X: Saber",
+        "C: Dash",
+        "T: Advance Text",
+        "Protective spell on*"
+    ]
+
+    for i, line in enumerate(controls_text):
+        controls_surface = controls_font.render(line, True, (255, 255, 255))
+        controls_rect = controls_surface.get_rect(topright=(SCREEN_WIDTH - 10, 10 + i * 20))
+        screen.blit(controls_surface, controls_rect)
 
 
     # Check if the player crosses the position to transition to a new file

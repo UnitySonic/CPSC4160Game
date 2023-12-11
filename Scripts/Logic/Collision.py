@@ -153,7 +153,9 @@ class collisionBox(pygame.sprite.Sprite):
                 self.getEntity().handleCollision(collisionType, OffendingBox)
 
 
-
+    def checkCollision(self, other_rect):
+        # Check for collision
+        return self.rect.colliderect(other_rect)
 
 
 
